@@ -22,7 +22,6 @@ jobs:
           echo "${{ secrets.PRIVATE_INSTANCE_KEY }}" > private-key.pem
           chmod 400 private-key.pem
           ssh -tt -o StrictHostKeyChecking=no -i "private-key.pem" ubuntu@ec2-54-67-4-114.us-west-1.compute.amazonaws.com
-          kubectl get nodes
           
 #       - name: Setting up kubeconfig ENV for Github Chaos Action
 #         run: echo ::set-env name=KUBE_CONFIG_DATA::$(base64 -w 0 ~/.kube/config)
