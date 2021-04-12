@@ -8,5 +8,17 @@ jobs:
   component-pipeline:
     runs-on: ubuntu-latest
     steps:
-      - name: Check helm
-        run: helm
+        - name: Kubectl
+          run: kubectl
+          
+#       - name: Connect to the Kubernetes Cluster
+#         run: | 
+#           mkdir -p ${HOME}/.kube
+#           echo "$CONFIG" > ${HOME}/.kube/config
+#         env:
+#           CONFIG: ${{ secrets.config }}
+          
+#       - name: Get nodes of the cluster
+#         run: kubectl get nodes
+        
+        
