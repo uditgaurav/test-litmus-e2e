@@ -21,6 +21,7 @@ jobs:
         run: |
           kubectl config view
           kubectl config use-context kubernetes-admin@kubernetes
+          kubectl get nodes
 
           
 #       - name: Setting up kubeconfig ENV for Github Chaos Action
