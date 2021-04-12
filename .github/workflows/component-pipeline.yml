@@ -15,7 +15,7 @@ jobs:
           chmod +x /home/runner/.kube/config
           aws --version
         env:
-          CONFIG: ${{ secrets.config }}
+          CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
           
       - name: Getting kube config
         run: cat /home/runner/.kube/config 
