@@ -6,7 +6,7 @@ on:
     
 jobs:
   component-pipeline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     steps:
       - name: Connect to the Kubernetes Cluster
         run: | 
