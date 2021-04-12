@@ -16,8 +16,8 @@ jobs:
 #           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
           
       - name: Getting the nodes
-        env:
-          KUBECONFIG: /home/runner/.kube/config 
+#         env:
+#           KUBECONFIG: /home/runner/.kube/config 
         run: |
           echo "${{ secrets.PRIVATE_INSTANCE_KEY }}" > udit.pem
           ssh -tt -o StrictHostKeyChecking=no "udit.pem" ubuntu@54.219.20.57
