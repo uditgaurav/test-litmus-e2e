@@ -10,12 +10,7 @@ jobs:
     steps:
       - name: Connect to the Kubernetes Cluster
         run: | 
-          mkdir -p ${HOME}/.kube
           echo "$CONFIG" > /home/runner/.kube/config
-          chmod +x /home/runner/.kube/config
-          sudo mkdir -p /etc/kubernetes
-          echo "$ADMIN_CONFIG" > /etc/kubernetes/admin.conf
-          aws --version
         env:
           CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
           ADMIN_CONFIG: ${{ secrets.ADMIN_CONFIG }}
@@ -30,6 +25,8 @@ jobs:
         
           
       - name: Get nodes of the cluster
+        env:
+          KUBECONFIG: ${{ secrets.KUBE_CONFIG_DATA }}      
         run: kubectl get nodes
         
         
