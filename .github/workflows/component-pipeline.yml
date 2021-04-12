@@ -26,9 +26,7 @@ jobs:
 #           ACTIONS_ALLOW_UNSECURE_COMMANDS: true          
         
           
-#       - name: Get nodes of the cluster
-#         env: 
-#           KUBECONFIG: /home/runner/.kube/config
-#         run: kubectl get nodes
+      - name: Get nodes of the cluster
+        run: kubectl get nodes
         
         
