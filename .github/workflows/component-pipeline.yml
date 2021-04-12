@@ -5,7 +5,7 @@ on:
     branches: [master]
     
 jobs:
-  lint:
+  component-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: Check helm
