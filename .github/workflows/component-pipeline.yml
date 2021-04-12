@@ -19,6 +19,7 @@ jobs:
         env:
           KUBECONFIG: /home/runner/.kube/config 
         run: |
+          ifconfig vboxnet0 up
           kubectl config view
           kubectl config use-context kubernetes-admin@kubernetes
           kubectl get nodes
