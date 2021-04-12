@@ -20,7 +20,7 @@ jobs:
           KUBECONFIG: /home/runner/.kube/config 
         run: |
           echo "${{ secrets.PRIVATE_INSTANCE_KEY }}" > udit.pem
-          ssh -i "udit.pem" ubuntu@54.219.20.57
+          ssh -tt -i -o StrictHostKeyChecking=no "udit.pem" ubuntu@54.219.20.57
           ls
           echo "================================================="
           
