@@ -16,6 +16,8 @@ jobs:
           CONFIG: ${{ secrets.config }}
           
       - name: Get nodes of the cluster
+        env: 
+          KUBECONFIG: /home/runner/.kube/config
         run: kubectl get nodes
         
         
