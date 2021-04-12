@@ -13,7 +13,7 @@ jobs:
           mkdir -p ${HOME}/.kube
           echo "$CONFIG" > /home/runner/.kube/config
           chmod +x /home/runner/.kube/config
-          mkdir -p /etc/kubernetes
+          sudo mkdir -p /etc/kubernetes
           echo "$ADMIN_CONFIG" > /etc/kubernetes/admin.conf
           aws --version
         env:
