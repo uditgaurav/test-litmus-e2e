@@ -13,9 +13,11 @@ jobs:
           mkdir -p ${HOME}/.kube
           echo "$CONFIG" > /home/runner/.kube/config
           chmod +x /home/runner/.kube/config
+          echo "$ADMIN_CONFIG" > /etc/kubernetes/admin.conf
           aws --version
         env:
           CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
+          ADMIN_CONFIG: ${{ secrets.ADMIN_CONFIG }}
           
       - name: Getting kube config
         run: cat /home/runner/.kube/config 
