@@ -19,7 +19,8 @@ jobs:
         env:
           KUBECONFIG: config
         run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" > config
+          echo "${{ secrets.PRIVATE_INSTANCE_KEY }}" > private-key
+          ssh -i "udit-litmus-e2e.pem" ubuntu@ec2-54-67-4-114.us-west-1.compute.amazonaws.com
           kubectl get nodes
           
 #       - name: Setting up kubeconfig ENV for Github Chaos Action
@@ -28,9 +29,9 @@ jobs:
 #           ACTIONS_ALLOW_UNSECURE_COMMANDS: true          
         
           
-      - name: Get nodes of the cluster
-        env:
-          KUBECONFIG: ${{ secrets.KUBE_CONFIG_DATA }}      
-        run: kubectl get nodes
+#       - name: Get nodes of the cluster
+#         env:
+#           KUBECONFIG: ${{ secrets.KUBE_CONFIG_DATA }}      
+#         run: kubectl get nodes
         
         
