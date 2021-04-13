@@ -23,8 +23,6 @@ on:
         default: 'Always'
       experimentImagePullPolicy:
         default: 'Always'
-      operatorName: 
-        default: 'chaos-operator-ce'
       updateWebsite: 
         default: 'false'
         
