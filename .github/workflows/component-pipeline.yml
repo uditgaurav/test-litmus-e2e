@@ -103,6 +103,8 @@ jobs:
         run: make operator-reconcile-resiliency-check
         
   App_Cleanup:
+    needs: Component_Test
+    if: always()
     container: 
       image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
@@ -116,6 +118,8 @@ jobs:
         run: make app-cleanup
                
   Litmus_Cleanup:
+    needs: App_Cleanup
+    if: always()
     container: 
       image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
