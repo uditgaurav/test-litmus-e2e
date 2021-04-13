@@ -5,6 +5,8 @@ on:
     branches: [master]
   workflow_dispatch:
     inputs:
+      e2eTestImage:
+        default: 'litmuschaos/litmus-e2e:ci'
       goExperimentImage:
         default: 'litmuschaos/go-runner:ci'
       newLibImage:
@@ -31,7 +33,7 @@ jobs:
 
   Setup_Litmus_Infra:
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
@@ -53,7 +55,7 @@ jobs:
   Setup_App_Deployment:
     needs:  Setup_Litmus_Infra
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
@@ -84,7 +86,7 @@ jobs:
   Component_Test:
     needs: Setup_App_Deployment
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
@@ -103,10 +105,8 @@ jobs:
         run: make operator-reconcile-resiliency-check
         
   App_Cleanup:
-    needs:
-      - Component_Test
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
@@ -118,10 +118,8 @@ jobs:
         run: make app-cleanup
                
   Litmus_Cleanup:
-    needs:
-      - App_Cleanup
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
