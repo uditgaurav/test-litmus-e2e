@@ -21,10 +21,6 @@ jobs:
     steps:
       - name: Getting the nodes
         run: |
-          ls
-          pwd
-          whoami
-          go --version
           kubectl get nodes
           
 
