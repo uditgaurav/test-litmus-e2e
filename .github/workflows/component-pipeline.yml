@@ -42,42 +42,41 @@ jobs:
         
     runs-on: self-hosted
     steps:
-#       - uses: actions/checkout@v2    
       - name: Litmus Infra Setup In Cluster-1
         run: |
           sleep 200
         
-##################################### Setup App ##################################################
+# ##################################### Setup App ##################################################
         
-  Setup_App_Deployment:
-    needs:  Setup_Litmus_Infra
-    container: 
-      image: "${{ github.event.inputs.e2eTestImage }}"
-      volumes:
-        - /home/ubuntu/.kube:/root/.kube
-        - /etc/kubernetes:/etc/kubernetes
-      env:
-        KUBECONFIG: /root/.kube/config
+#   Setup_App_Deployment:
+#     needs:  Setup_Litmus_Infra
+#     container: 
+#       image: "${{ github.event.inputs.e2eTestImage }}"
+#       volumes:
+#         - /home/ubuntu/.kube:/root/.kube
+#         - /etc/kubernetes:/etc/kubernetes
+#       env:
+#         KUBECONFIG: /root/.kube/config
         
-    runs-on: self-hosted
-    steps:
-#       - uses: actions/checkout@v2        
-      - name: Deploy App In Cluster-1
-        env:
-          KUBECONFIG: /root/.kube/config
-        run: make build-litmus        
+#     runs-on: self-hosted
+#     steps:
+# #       - uses: actions/checkout@v2        
+#       - name: Deploy App In Cluster-1
+#         env:
+#           KUBECONFIG: /root/.kube/config
+#         run: make build-litmus        
 
-      - name: Liveness In Cluster-1
-        if: ${{ always() }}
-        env:
-          KUBECONFIG: /root/.kube/config
-        run: make build-litmus        
+#       - name: Liveness In Cluster-1
+#         if: ${{ always() }}
+#         env:
+#           KUBECONFIG: /root/.kube/config
+#         run: make build-litmus        
 
-      - name: Auxiliary App In Cluster-1
-        if: ${{ always() }}
-        env:
-          KUBECONFIG: /root/.kube/config
-        run: make build-litmus
+#       - name: Auxiliary App In Cluster-1
+#         if: ${{ always() }}
+#         env:
+#           KUBECONFIG: /root/.kube/config
+#         run: make build-litmus
         
 # ##################################### Runing Component Tests ##################################################
         
