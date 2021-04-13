@@ -11,7 +11,7 @@ on:
         default: 'warning'
     
 jobs:
-  Setup Litmus Infra:
+  Setup_Litmus_Infra:
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
@@ -24,8 +24,8 @@ jobs:
           KUBECONFIG: /root/.kube/config
         run: make build-litmus
         
-  Setup App Deployment:
-    needs:  Setup Litmus Infra
+  Setup_App_Deployment:
+    needs:  Setup_Litmus_Infra
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
@@ -48,10 +48,10 @@ jobs:
           KUBECONFIG: /root/.kube/config
         run: make build-litmus
         
-  Component Test:
+  Component_Test:
     needs:
-      - Setup Litmus Infra
-      - Setup App Deployment   
+      - Setup_Litmus_Infra
+      - Setup_App_Deployment   
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
@@ -62,10 +62,10 @@ jobs:
       - name: TCID-EC2-GENERIC-OPERATOR-RECONCILE-RESILIENCY
         run: make operator-reconcile-resiliency-check
         
-  App Cleanup In Cluster-1:
+  App_Cleanup:
     needs:
-      - Component Test
-      - Setup App Deployment
+      - Component_Test
+      - Setup_App_Deployment
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
@@ -76,11 +76,11 @@ jobs:
       - name: Application Cleanup
         run: make app-cleanup
                
-  Litmus Cleanup In Cluster-1:
+  Litmus_Cleanup:
     needs:
-      - App Cleanup In Cluster-1
-      - Component Test
-      - Setup Litmus Infra
+      - App_Cleanup
+      - Component_Test
+      - Setup_Litmus_Infra
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
