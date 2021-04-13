@@ -25,6 +25,7 @@ jobs:
           KUBECONFIG: /root/.kube/config
         run: |
           kubectl get nodes
+          go
           
 
 #   component-pipeline-2:
