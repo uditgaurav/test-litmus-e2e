@@ -26,3 +26,4 @@ jobs:
           pwd
           whoami
           kubectl get nodes
+          sleep 50
