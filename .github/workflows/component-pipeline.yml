@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v2    
       - name: Litmus Infra Setup In Cluster-1
         run: |
-          make build-litmus
+          sleep 200
         
 ##################################### Setup App ##################################################
         
