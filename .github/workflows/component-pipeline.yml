@@ -9,6 +9,8 @@ on:
         default: 'litmuschaos/go-runner:ci'
       newLibImage:
         default: 'litmuschaos/go-runner:ci'
+      oldLibImage:
+        default: 'litmuschaos/go-runner:latest'        
       operatorImage:
         default: 'litmuschaos/chaos-operator:ci'
       runnerImage:
@@ -89,7 +91,8 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes
       env:
         GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"        
-        NEW_LIB_IMAGE: "${{ github.event.inputs.newLibImage }}"        
+        NEW_LIB_IMAGE: "${{ github.event.inputs.newLibImage }}" 
+        OLD_LIB_IMAGE: "${{ github.event.inputs.oldLibImage }}"                
         EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
         CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
         UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
