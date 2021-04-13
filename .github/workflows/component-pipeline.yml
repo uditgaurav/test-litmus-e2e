@@ -14,6 +14,7 @@ jobs:
           pwd
           whoami
           kubectl get nodes
+          sleep 50
 
 
   component-pipeline-2:
