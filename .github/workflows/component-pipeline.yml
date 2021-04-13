@@ -57,6 +57,8 @@ jobs:
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
+      env:
+        KUBECONFIG: /root/.kube/config
         
     runs-on: self-hosted
     steps:
@@ -95,7 +97,8 @@ jobs:
         EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
         CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
         UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
-
+        KUBECONFIG: /root/.kube/config
+        
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2        
@@ -110,8 +113,10 @@ jobs:
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
+      env:
+        KUBECONFIG: /root/.kube/config
+        
     runs-on: self-hosted
-    
     steps:
       - uses: actions/checkout@v2        
       - name: Application Cleanup
@@ -125,6 +130,9 @@ jobs:
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
+      env:
+        KUBECONFIG: /root/.kube/config
+        
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2        
