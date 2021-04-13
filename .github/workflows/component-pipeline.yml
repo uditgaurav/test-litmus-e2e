@@ -16,10 +16,13 @@ jobs:
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
         
     runs-on: self-hosted
     steps:
       - name: Getting the nodes
+        env:
+          KUBECONFIG: /root/.kube/config
         run: |
           kubectl get nodes
           
