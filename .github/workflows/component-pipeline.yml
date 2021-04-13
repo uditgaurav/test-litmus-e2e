@@ -19,10 +19,7 @@ jobs:
 #         env:
 #           KUBECONFIG: /home/runner/.kube/config 
         run: |
-          echo "${{ secrets.PRIVATE_INSTANCE_KEY }}" > udit.pem
-          ssh -tt -o StrictHostKeyChecking=no "udit.pem" ubuntu@54.219.20.57
           ls
-          echo "================================================="
           
 #       - name: Setting up kubeconfig ENV for Github Chaos Action
 #         run: echo ::set-env name=KUBE_CONFIG_DATA::$(base64 -w 0 ~/.kube/config)
