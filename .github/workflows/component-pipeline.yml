@@ -22,7 +22,7 @@ jobs:
       - name: Litmus Infra Setup In Cluster-1
         env:
           KUBECONFIG: /root/.kube/config
-        run: make build-litmus
+        run: ls
         
   Setup_App_Deployment:
     needs:  Setup_Litmus_Infra
