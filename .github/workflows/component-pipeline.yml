@@ -23,9 +23,7 @@ jobs:
       - name: Litmus Infra Setup In Cluster-1
         env:
           KUBECONFIG: /root/.kube/config
-        run: |
-          ls
-          make build-litmus
+        run: make build-litmus
         
   Setup_App_Deployment:
     needs:  Setup_Litmus_Infra
@@ -36,6 +34,7 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes      
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v2        
       - name: Deploy App In Cluster-1
         env:
           KUBECONFIG: /root/.kube/config
@@ -62,6 +61,7 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v2        
       - name: TCID-EC2-GENERIC-OPERATOR-RECONCILE-RESILIENCY
         run: make operator-reconcile-resiliency-check
         
@@ -76,6 +76,7 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v2        
       - name: Application Cleanup
         run: make app-cleanup
                
@@ -91,6 +92,7 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v2        
       - name: Application Cleanup
         run: make litmus-cleanup
                
