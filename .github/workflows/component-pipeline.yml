@@ -10,7 +10,7 @@ on:
       newLibImage:
         default: 'litmuschaos/go-runner:ci'
       oldLibImage:
-        default: "'litmuschaos/go-runner:latest'"        
+        default: 'litmuschaos/go-runner:latest'        
       operatorImage:
         default: 'litmuschaos/chaos-operator:ci'
       runnerImage:
@@ -136,43 +136,43 @@ jobs:
         if: ${{ always() }}      
         run: make target-pod          
 
-# ##################################### App Cleanup ##################################################
+##################################### App Cleanup ##################################################
 
-#   App_Cleanup:
-#     needs: Component_Test
-#     if: always()
-#     container: 
-#       image: "${{ github.event.inputs.e2eTestImage }}"
-#       volumes:
-#         - /home/ubuntu/.kube:/root/.kube
-#         - /etc/kubernetes:/etc/kubernetes
-#       env:
-#         KUBECONFIG: /root/.kube/config
+  App_Cleanup:
+    needs: Component_Test
+    if: always()
+    container: 
+      image: "${{ github.event.inputs.e2eTestImage }}"
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
+      env:
+        KUBECONFIG: /root/.kube/config
         
-#     runs-on: self-hosted
-#     steps:
-#       - uses: actions/checkout@v2        
-#       - name: Application Cleanup
-#         run: make app-cleanup
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2        
+      - name: Application Cleanup
+        run: make app-cleanup
 
-# ##################################### Litmus Cleanup ##################################################
+##################################### Litmus Cleanup ##################################################
 
-#   Litmus_Cleanup:
-#     needs: App_Cleanup
-#     if: always()
-#     container: 
-#       image: "${{ github.event.inputs.e2eTestImage }}"
-#       volumes:
-#         - /home/ubuntu/.kube:/root/.kube
-#         - /etc/kubernetes:/etc/kubernetes
-#       env:
-#         KUBECONFIG: /root/.kube/config
-#         COMPONENT_TEST: "true"   
+  Litmus_Cleanup:
+    needs: App_Cleanup
+    if: always()
+    container: 
+      image: "${{ github.event.inputs.e2eTestImage }}"
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
+      env:
+        KUBECONFIG: /root/.kube/config
+        COMPONENT_TEST: "true"   
 
-#     runs-on: self-hosted
-#     steps:
-#       - uses: actions/checkout@v2        
-#       - name: Litmus Cleanup
-#         run: make litmus-cleanup
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2        
+      - name: Litmus Cleanup
+        run: make litmus-cleanup
                
       
