@@ -19,10 +19,13 @@ jobs:
         - /etc/kubernetes:/etc/kubernetes
     runs-on: self-hosted
     steps:
+      - uses: actions/checkout@v2    
       - name: Litmus Infra Setup In Cluster-1
         env:
           KUBECONFIG: /root/.kube/config
-        run: ls
+        run: |
+          ls
+          make build-litmus
         
   Setup_App_Deployment:
     needs:  Setup_Litmus_Infra
