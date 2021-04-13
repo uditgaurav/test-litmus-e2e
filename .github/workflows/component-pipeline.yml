@@ -5,25 +5,50 @@ on:
     branches: [master]
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'     
-        required: true
-        default: 'warning'
-    
+      goExperimentImage:
+        default: 'litmuschaos/go-runner:ci'
+      newLibImage:
+        default: 'litmuschaos/go-runner:ci'
+      oldLibImage:
+        default: 'litmuschaos/go-runner:ci'
+      operatorImage:
+        default: 'litmuschaos/chaos-operator:ci'
+      runnerImage:
+        default: 'litmuschaos/chaos-runner:ci'
+      chaosNamespace:
+        default: 'litmus'
+      imagePullPolicy:
+        default: 'Always'
+      experimentImagePullPolicy:
+        default: 'Always'
+      operatorName: 
+        default: 'chaos-operator-ce'
+      updateWebsite: 
+        default: 'false'
+        
 jobs:
+##################################### Setup Litmus ##################################################
+
   Setup_Litmus_Infra:
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
+      env:
+        OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+        OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"        
+        RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+        IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+        KUBECONFIG: /root/.kube/config
+        
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2    
       - name: Litmus Infra Setup In Cluster-1
-        env:
-          KUBECONFIG: /root/.kube/config
         run: make build-litmus
+        
+##################################### Setup App ##################################################
         
   Setup_App_Deployment:
     needs:  Setup_Litmus_Infra
@@ -31,7 +56,8 @@ jobs:
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
-        - /etc/kubernetes:/etc/kubernetes      
+        - /etc/kubernetes:/etc/kubernetes
+        
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2        
@@ -41,24 +67,35 @@ jobs:
         run: make build-litmus        
 
       - name: Liveness In Cluster-1
+        if: ${{ always() }}
         env:
           KUBECONFIG: /root/.kube/config
         run: make build-litmus        
 
       - name: Auxiliary App In Cluster-1
+        if: ${{ always() }}
         env:
           KUBECONFIG: /root/.kube/config
         run: make build-litmus
         
+##################################### Setup Component Tests ##################################################
+        
+        
   Component_Test:
-    needs:
-      - Setup_Litmus_Infra
-      - Setup_App_Deployment   
+    needs: Setup_App_Deployment
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
+      env:
+        GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"        
+        NEW_LIB_IMAGE: "${{ github.event.inputs.newLibImage }}"        
+        OLD_LIB_IMAGE: "${{ github.event.inputs.oldLibImage }}"              
+        EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
+        CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+        UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
+
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2        
@@ -68,13 +105,13 @@ jobs:
   App_Cleanup:
     needs:
       - Component_Test
-      - Setup_App_Deployment
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
     runs-on: self-hosted
+    
     steps:
       - uses: actions/checkout@v2        
       - name: Application Cleanup
@@ -83,8 +120,6 @@ jobs:
   Litmus_Cleanup:
     needs:
       - App_Cleanup
-      - Component_Test
-      - Setup_Litmus_Infra
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
@@ -93,7 +128,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2        
-      - name: Application Cleanup
+      - name: Litmus Cleanup
         run: make litmus-cleanup
                
       
