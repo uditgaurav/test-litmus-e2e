@@ -8,32 +8,20 @@ jobs:
   component-pipeline:
     runs-on: self-hosted
     steps:
-#       - name: Connect to the Kubernetes Cluster
-#         run: | 
-#           mkdir -p /home/runner/.kube/
-#           echo "$KUBE_CONFIG_DATA" > /home/runner/.kube/config
-#         env:
-#           KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
-          
       - name: Getting the nodes
-#         env:
-#           KUBECONFIG: /home/runner/.kube/config 
         run: |
           ls
           pwd
           whoami
           kubectl get nodes
-          kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-          
-#       - name: Setting up kubeconfig ENV for Github Chaos Action
-#         run: echo ::set-env name=KUBE_CONFIG_DATA::$(base64 -w 0 ~/.kube/config)
-#         env:
-#           ACTIONS_ALLOW_UNSECURE_COMMANDS: true          
-        
-          
-#       - name: Get nodes of the cluster
-#         env:
-#           KUBECONFIG: ${{ secrets.KUBE_CONFIG_DATA }}      
-#         run: kubectl get nodes
-        
-        
+
+
+  component-pipeline-2:
+    runs-on: self-hosted
+    steps:
+      - name: Getting the nodes
+        run: |
+          ls
+          pwd
+          whoami
+          kubectl get nodes
