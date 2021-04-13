@@ -12,7 +12,11 @@ on:
     
 jobs:
   component-pipeline:
-    container: litmuschaos/litmus-e2e:ci
+    container: 
+      image: litmuschaos/litmus-e2e:ci
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        
     runs-on: self-hosted
     steps:
       - name: Getting the nodes
@@ -20,8 +24,9 @@ jobs:
           ls
           pwd
           whoami
-          kubectl get nodes
           go --version
+          kubectl get nodes
+          
 
 #   component-pipeline-2:
 #     runs-on: self-hosted
