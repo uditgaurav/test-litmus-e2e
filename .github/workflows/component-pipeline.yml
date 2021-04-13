@@ -20,7 +20,7 @@ jobs:
           pwd
           whoami
           kubectl get nodes
-          sleep 50
+          sleep 100
 
   component-pipeline-2:
     runs-on: self-hosted
