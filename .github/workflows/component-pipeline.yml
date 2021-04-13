@@ -104,6 +104,38 @@ jobs:
       - name: TCID-EC2-GENERIC-OPERATOR-RECONCILE-RESILIENCY
         run: make operator-reconcile-resiliency-check
 
+      - name: TCID-EC2-GENERIC-OPERATOR-ADMIN-MODE
+        if: ${{ always() }}      
+        run: make admin-mode-check
+
+      - name: TCID-EC2-GENERIC-ENGINE-APP-INFO
+        if: ${{ always() }}      
+        run: make appinfo
+
+      - name: TCID-EC2-GENERIC-ENGINE-ANNOTATION-CHECK
+        if: ${{ always() }}      
+        run: make annotation-check
+        
+      - name: TCID-EC2-GENERIC-ENGINE-ENGINE-STATE
+        if: ${{ always() }}      
+        run: make engine-state
+        
+      - name: TCID-EC2-GENERIC-ENGINE-JOB-CLEANUP-POLICY
+        if: ${{ always() }}      
+        run: make job-cleanup-policy     
+        
+      - name: TCID-EC2-GENERIC-ENGINE-SERVICE-ACCOUNT
+        if: ${{ always() }}      
+        run: make service-account 
+        
+      - name: TCID-EC2-GENERIC-EXPERIMENT-EXPERIMENT-IMAGE-NAME
+        if: ${{ always() }}      
+        run: make experiment-image
+        
+      - name: TCID-EC2-GENERIC-EXPERIMENT-TARGET-POD
+        if: ${{ always() }}      
+        run: make target-pod          
+
 ##################################### App Cleanup ##################################################
 
   App_Cleanup:
