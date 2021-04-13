@@ -23,6 +23,7 @@ jobs:
           pwd
           whoami
           kubectl get nodes
+          kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
           
 #       - name: Setting up kubeconfig ENV for Github Chaos Action
 #         run: echo ::set-env name=KUBE_CONFIG_DATA::$(base64 -w 0 ~/.kube/config)
