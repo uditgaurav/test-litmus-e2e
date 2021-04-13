@@ -29,7 +29,7 @@ jobs:
 
   Setup_Litmus_Infra:
     container: 
-      image: litmuschaos/litmus-e2e:ci
+      image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
