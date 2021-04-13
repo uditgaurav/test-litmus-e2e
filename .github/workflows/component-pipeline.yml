@@ -10,7 +10,7 @@ on:
       newLibImage:
         default: 'litmuschaos/go-runner:ci'
       oldLibImage:
-        default: 'litmuschaos/go-runner:latest'        
+        default: "'litmuschaos/go-runner:latest'"        
       operatorImage:
         default: 'litmuschaos/chaos-operator:ci'
       runnerImage:
