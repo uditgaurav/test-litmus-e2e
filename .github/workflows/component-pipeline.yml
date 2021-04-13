@@ -44,7 +44,7 @@ jobs:
     steps:
       - name: Litmus Infra Setup In Cluster-1
         run: |
-          sleep 200
+          sleep 500
         
 # ##################################### Setup App ##################################################
         
