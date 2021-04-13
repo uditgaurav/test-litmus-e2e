@@ -12,6 +12,7 @@ on:
     
 jobs:
   component-pipeline:
+    container: litmuschaos/litmus-e2e:ci
     runs-on: self-hosted
     steps:
       - name: Getting the nodes
@@ -20,15 +21,15 @@ jobs:
           pwd
           whoami
           kubectl get nodes
-          sleep 100
+          go --version
 
-  component-pipeline-2:
-    runs-on: self-hosted
-    steps:
-      - name: Getting the nodes
-        run: |
-          ls
-          pwd
-          whoami
-          kubectl get nodes
-          sleep 50
+#   component-pipeline-2:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Getting the nodes
+#         run: |
+#           ls
+#           pwd
+#           whoami
+#           kubectl get nodes
+#           sleep 50
