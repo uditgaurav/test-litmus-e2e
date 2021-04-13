@@ -1,5 +1,5 @@
 ---
-name: Build
+name: Component-Pipeline
 on:
   push:
     branches: [master]
@@ -11,30 +11,84 @@ on:
         default: 'warning'
     
 jobs:
-  component-pipeline:
+  Setup Litmus Infra:
     container: 
       image: litmuschaos/litmus-e2e:ci
       volumes:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
-        
     runs-on: self-hosted
     steps:
-      - name: Getting the nodes
+      - name: Litmus Infra Setup In Cluster-1
         env:
           KUBECONFIG: /root/.kube/config
-        run: |
-          kubectl get nodes
-          go
-          
+        run: make build-litmus
+        
+  Setup App Deployment:
+    needs:  Setup Litmus Infra
+    container: 
+      image: litmuschaos/litmus-e2e:ci
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes      
+    runs-on: self-hosted
+    steps:
+      - name: Deploy App In Cluster-1
+        env:
+          KUBECONFIG: /root/.kube/config
+        run: make build-litmus        
 
-#   component-pipeline-2:
-#     runs-on: self-hosted
-#     steps:
-#       - name: Getting the nodes
-#         run: |
-#           ls
-#           pwd
-#           whoami
-#           kubectl get nodes
-#           sleep 50
+      - name: Liveness In Cluster-1
+        env:
+          KUBECONFIG: /root/.kube/config
+        run: make build-litmus        
+
+      - name: Auxiliary App In Cluster-1
+        env:
+          KUBECONFIG: /root/.kube/config
+        run: make build-litmus
+        
+  Component Test:
+    needs:
+      - Setup Litmus Infra
+      - Setup App Deployment   
+    container: 
+      image: litmuschaos/litmus-e2e:ci
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
+    runs-on: self-hosted
+    steps:
+      - name: TCID-EC2-GENERIC-OPERATOR-RECONCILE-RESILIENCY
+        run: make operator-reconcile-resiliency-check
+        
+  App Cleanup In Cluster-1:
+    needs:
+      - Component Test
+      - Setup App Deployment
+    container: 
+      image: litmuschaos/litmus-e2e:ci
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
+    runs-on: self-hosted
+    steps:
+      - name: Application Cleanup
+        run: make app-cleanup
+               
+  Litmus Cleanup In Cluster-1:
+    needs:
+      - App Cleanup In Cluster-1
+      - Component Test
+      - Setup Litmus Infra
+    container: 
+      image: litmuschaos/litmus-e2e:ci
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /etc/kubernetes:/etc/kubernetes
+    runs-on: self-hosted
+    steps:
+      - name: Application Cleanup
+        run: make litmus-cleanup
+               
+      
