@@ -48,6 +48,7 @@ jobs:
     steps:
       - name: Litmus Infra Setup In Cluster-1
         run: |
+          pwd
           make build-litmus
         
 ##################################### Setup App ##################################################
