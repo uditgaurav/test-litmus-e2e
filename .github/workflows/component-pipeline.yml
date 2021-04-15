@@ -69,13 +69,13 @@ jobs:
       - name: Deploy App In Cluster-1
         run: make app-deploy        
 
-      - name: Liveness In Cluster-1
-        if: ${{ always() }}
-        run: make liveness        
+#       - name: Liveness In Cluster-1
+#         if: ${{ always() }}
+#         run: make liveness        
 
-      - name: Auxiliary App In Cluster-1
-        if: ${{ always() }}
-        run: make auxiliary-app
+#       - name: Auxiliary App In Cluster-1
+#         if: ${{ always() }}
+#         run: make auxiliary-app
         
 ##################################### Runing Component Tests ##################################################
         
