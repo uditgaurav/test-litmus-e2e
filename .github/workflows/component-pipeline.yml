@@ -45,7 +45,7 @@ jobs:
       - name: Litmus Infra Setup In Cluster-1
         working-directory: /go/src
         run: |
-          make build litmus
+          make build-litmus
         
 ##################################### Setup App ##################################################
         
@@ -67,15 +67,15 @@ jobs:
     steps:
 #       - uses: actions/checkout@v2        
       - name: Deploy App In Cluster-1
-        run: make build-litmus        
+        run: make app-deploy        
 
       - name: Liveness In Cluster-1
         if: ${{ always() }}
-        run: make build-litmus        
+        run: make liveness        
 
       - name: Auxiliary App In Cluster-1
         if: ${{ always() }}
-        run: make build-litmus
+        run: make auxiliary-app
         
 ##################################### Runing Component Tests ##################################################
         
