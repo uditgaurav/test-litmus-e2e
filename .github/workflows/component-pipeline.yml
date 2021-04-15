@@ -48,7 +48,7 @@ jobs:
       - name: Litmus Infra Setup In Cluster-1
         working-directory: /go/src
         run: |
-          make litmus-build
+          make build-litmus
         
 ##################################### Setup App ##################################################
         
