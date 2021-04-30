@@ -45,7 +45,7 @@ jobs:
         IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
         KUBECONFIG: /root/.kube/config
 
-    runs-on: [self-hosted,component]
+    runs-on: [self-hosted,com]
     ## Changing the working directory to image path we provided
     ## As the default path is repository checkout path.      
     steps:
@@ -65,7 +65,7 @@ jobs:
       env:
         KUBECONFIG: /root/.kube/config
 
-    runs-on: [self-hosted,component]   
+    runs-on: [self-hosted,com]   
     steps:
       - name: Deploy App In Cluster-1
         run: make app-deploy        
@@ -96,7 +96,7 @@ jobs:
         UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
         KUBECONFIG: /root/.kube/config
 
-    runs-on: [self-hosted,component]   
+    runs-on: [self-hosted,com]   
     steps:
       - name: TCID-EC2-GENERIC-APP-POD-DELETE      
         run: make pod-delete
@@ -155,7 +155,7 @@ jobs:
         UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
         KUBECONFIG: /root/.kube/config
 
-    runs-on: [self-hosted,component]   
+    runs-on: [self-hosted,com]   
     steps:
       - name: TCID-EC2-GENERIC-APP-POD-AFFECTED-PERCENTAGE-TON-PARALLEL      
         run: make pod-affected-perc-ton-parallel
@@ -181,7 +181,7 @@ jobs:
       env:
         KUBECONFIG: /root/.kube/config
 
-    runs-on: [self-hosted,component]    
+    runs-on: [self-hosted,com]    
     steps:
       - name: Application Cleanup      
         run: make app-cleanup
@@ -200,7 +200,7 @@ jobs:
         KUBECONFIG: /root/.kube/config
         POD_LEVEL: "true"   
 
-    runs-on: [self-hosted,component]      
+    runs-on: [self-hosted,comp]      
     steps:
       - name: Litmus Cleanup      
         run: make litmus-cleanup
