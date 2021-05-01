@@ -206,7 +206,7 @@ jobs:
         KUBECONFIG: /root/.kube/config
         POD_LEVEL: "true"   
 
-    runs-on: [self-hosted,comp]      
+    runs-on: [self-hosted,com]      
     steps:
       - name: Litmus Cleanup      
         run: make litmus-cleanup
