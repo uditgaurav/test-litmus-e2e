@@ -43,7 +43,7 @@ jobs:
         OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"        
         RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
         IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
-        KUBECONFIG: /home/udit/.kube/config
+        KUBECONFIG: /root/.kube/config
 
     runs-on: [self-hosted,com]
     ## Changing the working directory to image path we provided
@@ -94,7 +94,7 @@ jobs:
         EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
         CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
         UPDATE_WEBSITE: "${{ github.event.inputs.updateWebsite }}"
-        KUBECONFIG: /home/udit/.kube/config
+        KUBECONFIG: /root/.kube/config
 
     runs-on: [self-hosted,com]   
     steps:
@@ -197,7 +197,7 @@ jobs:
         - /home/ubuntu/.kube:/root/.kube
         - /etc/kubernetes:/etc/kubernetes
       env:
-        KUBECONFIG: /home/udit/.kube/config
+        KUBECONFIG: /root/.kube/config
         POD_LEVEL: "true"   
 
     runs-on: [self-hosted,comp]      
