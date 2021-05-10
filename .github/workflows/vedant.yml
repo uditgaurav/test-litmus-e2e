@@ -1,0 +1,45 @@
+---
+name: Pod-Level-Pipeline
+on:
+  schedule:
+    - cron: "30 20 * * *"
+env:
+  e2eTestImage: "litmuschaos/litmus-e2e:ci"
+  goExperimentImage: "litmuschaos/go-runner:ci"
+  newLibImage: "litmuschaos/go-runner:ci"
+  oldLibImage: "litmuschaos/go-runner:latest"
+  operatorImage: "litmuschaos/chaos-operator:ci"
+  runnerImage: "litmuschaos/chaos-runner:ci"
+  chaosNamespace: "litmus"
+  imagePullPolicy: "Always"
+  experimentImagePullPolicy: "Always"
+  updateWebsite: "true"
+
+defaults:
+  run:
+    working-directory: /go/src
+
+jobs:
+  ### Setup Litmus
+
+  Setup_Litmus_Infra:
+    container:
+      image: "${{ env.e2eTestImage }}"
+      volumes:
+        - /home/ubuntu/.kube:/root/.kube
+        - /home/ubuntu/.aws:/root/.aws
+        - /etc/kubernetes:/etc/kubernetes
+      env:
+        OPERATOR_IMAGE: "${{ env.operatorImage }}"
+        OPERATOR_NAME: "${{ env.operatorName }}"
+        RUNNER_IMAGE: "${{ env.runnerImage }}"
+        IMAGE_PULL_POLICY: "${{ env.imagePullPolicy }}"
+        KUBECONFIG: /root/.kube/config
+
+    runs-on: [self-hosted, pod-level]
+    ## Changing the working directory to image path we provided
+    ## As the default path is repository checkout path.
+    steps:
+      - name: Litmus Infra Setup In Cluster-1
+        run: |
+          make build-litmus
