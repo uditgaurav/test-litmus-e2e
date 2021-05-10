@@ -36,8 +36,8 @@ jobs:
     container: 
       image: "${{ github.event.inputs.e2eTestImage }}"
       volumes:
-        - /home/udit/.kube:/root/.kube
-        - /home/udit/.aws:/root/.aws
+        - $HOME/.kube:/root/.kube
+        - $HOME/.aws:/root/.aws
         - /etc/kubernetes:/etc/kubernetes
       env:
         OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
