@@ -1,13 +1,9 @@
 ---
 name: Pod-Level-Pipeline
-# on:
-#   schedule:
-#     - cron: "*/5 * * * *"
+on:
+  workflow_dispatch:
+  
 env:
-  OPERATOR_IMAGE: "${{ env.operatorImage }}"
-  OPERATOR_NAME: "${{ env.operatorName }}"
-  RUNNER_IMAGE: "${{ env.runnerImage }}"
-  IMAGE_PULL_POLICY: "${{ env.imagePullPolicy }}"
   KUBECONFIG: /root/.kube/config  
 
         
@@ -20,7 +16,7 @@ jobs:
 
   Setup_Litmus_Infra:
     container:
-      image: "${{ env.e2eTestImage }}"
+      image: "${{ secrets.EXP_IMAGE }}"
       volumes:
         - /home/udit/.kube:/root/.kube
         - /home/udit/.aws:/root/.aws
