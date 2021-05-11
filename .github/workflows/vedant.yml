@@ -17,6 +17,9 @@ jobs:
     defaults:
       run:
         working-directory: ./
+    steps:
+      - name: Litmus Infra Setup In Cluster-1
+        run: echo "Run"     
     outputs:
       e2eTestImage: "${{ secrets.EXP_IMAGE }}"
       
