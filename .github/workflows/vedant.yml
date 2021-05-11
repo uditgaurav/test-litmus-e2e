@@ -12,11 +12,20 @@ defaults:
     working-directory: /go/src
 
 jobs:
+  Variables_Setup:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    outputs:
+      e2eTestImage: "${{ secrets.EXP_IMAGE }}"
+      
   ### Setup Litmus
 
   Setup_Litmus_Infra:
+    needs: Variables_Setup  
     container:
-      image: "${{ secrets.EXP_IMAGE }}"
+      image: "${{ needs.Variables_Setup.outputs.e2eTestImage }}"
       volumes:
         - /home/udit/.kube:/root/.kube
         - /home/udit/.aws:/root/.aws
