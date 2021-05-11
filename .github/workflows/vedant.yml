@@ -1,8 +1,8 @@
 ---
 name: Pod-Level-Pipeline
-on:
-  schedule:
-    - cron: "*/5 * * * *"
+# on:
+#   schedule:
+#     - cron: "*/5 * * * *"
 env:
   OPERATOR_IMAGE: "${{ env.operatorImage }}"
   OPERATOR_NAME: "${{ env.operatorName }}"
