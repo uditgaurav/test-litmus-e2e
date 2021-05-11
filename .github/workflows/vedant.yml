@@ -34,7 +34,7 @@ jobs:
         - /home/udit/.aws:/root/.aws
         - /etc/kubernetes:/etc/kubernetes
 
-    runs-on: [self-hosted, pod-level]
+    runs-on: [self-hosted, component]
     ## Changing the working directory to image path we provided
     ## As the default path is repository checkout path.
     steps:
