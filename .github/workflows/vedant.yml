@@ -1,8 +1,8 @@
 ---
 name: Vedant
 on:
-  workflow_dispatch:
-  
+  schedule:
+    - cron: "30 22 * * *" # Daily 02:30 AM in midnight
 env:
   KUBECONFIG: /root/.kube/config  
 
