@@ -1,5 +1,5 @@
 ---
-name: Pod-Level-Pipeline
+name: ewovc
 on:
   workflow_dispatch:
     inputs:
