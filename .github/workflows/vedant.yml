@@ -7,7 +7,9 @@ on:
         default: "liiefbwiefnqtmus"
 jobs:
   Experiment_Tunables:
-    env:
+    container:
+      image: "litmuschaos/litmus-e2e:ci"  
+      env:
         CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
     runs-on: ubuntu-latest
     steps:
