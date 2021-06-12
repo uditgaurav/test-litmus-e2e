@@ -1,43 +1,75 @@
 ---
-name: Vedant
+name: Pod-Level-Pipeline
 on:
-  schedule:
-    - cron: "30 22 * * *" # Daily 02:30 AM in midnight
-env:
-  KUBECONFIG: /root/.kube/config  
+  workflow_dispatch:
+    inputs:
+      chaosNamespace:
+        default: "liiefbwiefnqtmus"
+jobs:
+  Experiment_Tunables:
+    env:
+        CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Namespace and deploy Application
+        run: |
+          echo "My name is: ${CHAOS_NAMESPACE}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ---
+# name: Vedant
+# on:
+#   schedule:
+#     - cron: "30 22 * * *" # Daily 02:30 AM in midnight
+# env:
+#   KUBECONFIG: /root/.kube/config  
 
         
-defaults:
-  run:
-    working-directory: /go/src
+# defaults:
+#   run:
+#     working-directory: /go/src
 
-jobs:
-  Variables_Setup:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
-    steps:
-      - name: Litmus Infra Setup In Cluster-1
-        run: echo "Run"     
-    outputs:
-      e2eTestImage: "${{ secrets.EXP_IMAGE }}"
+# jobs:
+#   Variables_Setup:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: ./
+#     steps:
+#       - name: Litmus Infra Setup In Cluster-1
+#         run: echo "Run"     
+#     outputs:
+#       e2eTestImage: "${{ secrets.EXP_IMAGE }}"
       
-  ### Setup Litmus
+#   ### Setup Litmus
 
-  Setup_Litmus_Infra:
-    needs: Variables_Setup  
-    container:
-      image: "${{ needs.Variables_Setup.outputs.e2eTestImage }}"
-      volumes:
-        - /home/udit/.kube:/root/.kube
-        - /home/udit/.aws:/root/.aws
-        - /etc/kubernetes:/etc/kubernetes
+#   Setup_Litmus_Infra:
+#     needs: Variables_Setup  
+#     container:
+#       image: "${{ needs.Variables_Setup.outputs.e2eTestImage }}"
+#       volumes:
+#         - /home/udit/.kube:/root/.kube
+#         - /home/udit/.aws:/root/.aws
+#         - /etc/kubernetes:/etc/kubernetes
 
-    runs-on: [self-hosted, component]
-    ## Changing the working directory to image path we provided
-    ## As the default path is repository checkout path.
-    steps:
-      - name: Litmus Infra Setup In Cluster-1
-        run: |
-          make build-litmus
+#     runs-on: [self-hosted, component]
+#     ## Changing the working directory to image path we provided
+#     ## As the default path is repository checkout path.
+#     steps:
+#       - name: Litmus Infra Setup In Cluster-1
+#         run: |
+#           make build-litmus
