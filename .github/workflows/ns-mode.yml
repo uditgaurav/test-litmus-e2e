@@ -1,3 +1,57 @@
+---
+name: Namespace-Mode-Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      e2eTestRepo:
+        default: "litmuschaos/litmus-e2e"
+      e2eTestBranch:
+        default: "master"        
+      goExperimentImage:
+        default: "litmuschaos/go-runner:ci"
+      libImage:
+        default: "litmuschaos/go-runner:ci"
+      operatorImage:
+        default: "litmuschaos/chaos-operator:ci"
+      runnerImage:
+        default: "litmuschaos/chaos-runner:ci"
+      chaosNamespace:
+        default: "chaos"
+      imagePullPolicy:
+        default: "Always"
+      experimentImagePullPolicy:
+        default: "Always"
+      chaosServiceAccount:
+        default: "litmus-ns-exp-sa"
+
+defaults:
+  run:
+    working-directory: /go/src
+
+jobs:
+
+  Pod_Delete_Namespace_Mode:
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: $HOME/.kube/config
+
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'          
+
       #Install and configure a k3s cluster
       - name: Installing Prerequisites (K3S Cluster)
         run: |
@@ -6,3 +60,18 @@
           cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
           kubectl wait node --all --for condition=ready --timeout=180s
           kubectl get nodes
+
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create ns ${APP_NS}
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Delete Tests
+        run: make pod-delete
