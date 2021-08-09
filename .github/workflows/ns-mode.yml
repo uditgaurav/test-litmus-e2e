@@ -51,7 +51,7 @@ jobs:
           apk add --update docker openrc && rc-update add docker boot
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
           chmod +x ./kind
-          ./kind create cluster -wait 5m
+          ./kind create cluster --wait 5m
           kubectl get nodes
 
           
