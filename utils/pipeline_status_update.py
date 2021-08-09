@@ -46,6 +46,8 @@ def get_file_to_update(pipeline,tag):
                      return "generic-pipeline/pipeline-runs/node-level-run.html"
               elif pipeline == "component":
                      return "generic-pipeline/pipeline-runs/litmus-component-run.html"
+              elif pipeline == "portal-e2e":
+                     return "portal-pipeline/pipeline-runs/portal-run.html"
               else:
                      raise Exception('Sorry, no pipeline found with name '+pipeline)
        elif "RC" in tag:
@@ -55,6 +57,8 @@ def get_file_to_update(pipeline,tag):
                      return "generic-pipeline/pipeline-runs/node-level-rc.html"
               elif pipeline == "component":
                      return "generic-pipeline/pipeline-runs/litmus-component-rc.html"
+              elif pipeline == "portal-e2e":
+                     return "portal-pipeline/pipeline-runs/portal-rc.html"
               else:
                      raise Exception('Sorry, no pipeline found with name '+pipeline)
        else:
@@ -64,15 +68,17 @@ def get_file_to_update(pipeline,tag):
                      return "generic-pipeline/pipeline-runs/node-level-ga.html"
               elif pipeline == "component":
                      return "generic-pipeline/pipeline-runs/litmus-component-ga.html"
+              elif pipeline == "portal-e2e":
+                     return "portal-pipeline/pipeline-runs/portal-ga.html"
               else:
                      raise Exception('Sorry, no pipeline found with name '+pipeline)
 
 repo = github_token.get_repo("litmuschaos/litmus-e2e")
-b= repo.get_branch(branch="master")
+b= repo.get_branch(branch="gh-pages")
 filename = get_file_to_update(pipeline,tag)
 print("filename to be updated: "+filename)
-contents = repo.get_contents(filename, "master")
-file = repo.get_contents(contents.path, "master")
+contents = repo.get_contents(filename, "gh-pages")
+file = repo.get_contents(contents.path, "gh-pages")
 file_path = contents.path
 file_content=str(file.decoded_content)
 content_list = file_content.split('\n')
@@ -80,12 +86,12 @@ content_list = file_content.split('\n')
 file_update_retries = 5
 
 # github pipeline url using pipeline_id
-pipeline_url ="<a href= \"https://gitlab.mayadata.io/litmuschaos/litmus-e2e/pipelines/{0}\">{0}</a>".format(pipeline_id)
+pipeline_url ="<a href= \"https://github.com/litmuschaos/litmus-e2e/actions/runs/{0}\">{0}</a>".format(pipeline_id)
 
 def fetch_file_content():
     # fetching file contents of github file_path
     count=0
-    file = repo.get_contents(file_path, "master")
+    file = repo.get_contents(file_path, "gh-pages")
     file_content=str(file.decoded_content, 'utf-8')
     content_list = file_content.split('\n')
     totalCoverage= '<a href=\"https://bit.ly/2OLie8t\"><img alt='+coverage+'% src=\"https://progress-bar.dev/'+coverage+'\" /></a>'
@@ -93,6 +99,12 @@ def fetch_file_content():
            version_name = "Version"
     else:
            version_name = "Release Version"
+    
+    index = content_list.index("      <script type = 'text/javascript'>")
+    del content_list[index+1]
+    content_list.insert(index+1,("var data = [['Total', 'Coverage'],['Passed',  {}],['Failed',  {}],]".format(coverage, str(100- int(coverage)))))
+    updated_file_content =  ('\n').join(content_list)
+
     # updating result's table if the table is already present
     if file_content.find('<table>\n <tr>\n  <th>Pipeline ID</th>\n  <th>Execution Time</th>\n  <th>'+version_name+'</th></tr>\n')>0:
         new_pipeline = ' <tr>\n  <td>{}</td>\n  <td>{}</td>\n  <td>{}</td>\n </tr>\n'.format(pipeline_url,time_stamp,tag)
@@ -132,7 +144,7 @@ print("Trying to update respective html files at path: {}".format(file_path))
 try:
     print("Pipeline table content update try: {}".format(try_count))
     try_count += 1
-    repo.update_file(file_path, commit_message, updated_file_content, file.sha, branch="master")
+    repo.update_file(file_path, commit_message, updated_file_content, file.sha, branch="gh-pages")
     print("Pipeline table updated successfully")
 except github.GithubException as e:
     exception = e
@@ -154,7 +166,7 @@ except github.GithubException as e:
        try_count += 1
 
        # retry committing Pipeline table file 
-       repo.update_file(file_path, commit_message, updated_file_content, file.sha, branch="master")
+       repo.update_file(file_path, commit_message, updated_file_content, file.sha, branch="gh-pages")
        print("Pipeline table updated successfully")
 
        # exit the loop as file updated successfully
@@ -168,4 +180,3 @@ except github.GithubException as e:
      else:
        print("Pipeline table updation failed")
        break
-

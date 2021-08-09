@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus-e2e/pkg"
 	"github.com/litmuschaos/litmus-e2e/pkg/environment"
 	"github.com/litmuschaos/litmus-e2e/pkg/types"
@@ -29,6 +30,8 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			//Getting kubeConfig and Generate ClientSets
 			By("[PreChaos]: Getting kubeconfig and generate clientset")
@@ -48,12 +51,12 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
-			err = pkg.PrepareChaos(&testsDetails, false)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, false)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -68,7 +71,7 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -81,12 +84,14 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 	// BDD TEST CASE 2
 	//Add abort-chaos for the chaos experiment
-	Context("Abort-Chaos check of abort chaos", func() {
+	Context("Abort-Chaos check for pod io stress experiment", func() {
 
 		It("Should check the abort of pod-io-stress experiment", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("RUNNING POD-IO-STRESS ABORT CHAOS TEST!!!")
 			//Getting kubeConfig and Generate ClientSets
@@ -106,12 +111,12 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
-			err = pkg.PrepareChaos(&testsDetails, false)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, false)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -149,12 +154,14 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 	})
 
 	// BDD TEST CASE 3
-	Context("Check for litmus components", func() {
+	Context("Check pod io stress experiment with annotation true", func() {
 
 		It("Should check the experiment when app is annotated", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			//Getting kubeConfig and Generate ClientSets
 			By("[PreChaos]: Getting kubeconfig and generate clientset")
@@ -174,12 +181,12 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -194,7 +201,7 @@ var _ = Describe("BDD of pod-io-stress experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 		})

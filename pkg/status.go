@@ -9,38 +9,60 @@ import (
 	"github.com/litmuschaos/litmus-go/pkg/utils/retry"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog"
 )
 
 //RunnerPodStatus will check the runner pod running state
-func RunnerPodStatus(testsDetails *types.TestDetails, runnerNamespace string, clients environment.ClientSets) (error, error) {
+func RunnerPodStatus(testsDetails *types.TestDetails, runnerNamespace string, clients environment.ClientSets) error {
 
 	//Fetching the runner pod and Checking if it gets in Running state or not
+	if err = CheckRunnerPodCreation(testsDetails.EngineName, runnerNamespace, clients); err != nil {
+		return errors.Errorf("fail to get the runner pod, due to %v", err)
+	}
 	runner, err := clients.KubeClient.CoreV1().Pods(runnerNamespace).Get(testsDetails.EngineName+"-runner", metav1.GetOptions{})
 	if err != nil {
-		return nil, errors.Errorf("Unable to get the runner pod, due to %v", err)
+		return errors.Errorf("Unable to get the runner pod, due to %v", err)
 	}
-	log.Infof("name : %v \n", runner.Name)
-	//Running it for infinite time (say 3000 * 10)
-	//The Gitlab job will quit if it takes more time than default time (10 min)
 	for i := 0; i < 300; i++ {
 		if string(runner.Status.Phase) != "Running" {
 			time.Sleep(1 * time.Second)
 			runner, err = clients.KubeClient.CoreV1().Pods(runnerNamespace).Get(testsDetails.EngineName+"-runner", metav1.GetOptions{})
 			if err != nil || runner.Status.Phase == "Succeeded" || runner.Status.Phase == "" {
-				return nil, errors.Errorf("Fail to get the runner pod status after sleep, due to %v", err)
+				return errors.Errorf("Fail to get the runner pod status after sleep, due to %v", err)
 			}
-			log.Infof("The Runner pod is in %v State \n", runner.Status.Phase)
+			log.Infof("The Runner pod is in %v State ", runner.Status.Phase)
 		} else {
 			break
 		}
 	}
 
 	if runner.Status.Phase != "Running" {
-		return nil, errors.Errorf("Runner pod fail to come in running state, due to %v", err)
+		return errors.Errorf("Runner pod fail to come in running state, due to %v", err)
 	}
-	log.Info("Runner pod is in Running state")
+	log.Info("[Status]: Runner pod is in Running state")
 
-	return nil, nil
+	return nil
+}
+
+// CheckRunnerPodCreation will check for the create of runner pod
+func CheckRunnerPodCreation(engineName, runnerNS string, clients environment.ClientSets) error {
+	err := retry.
+		Times(uint(10 / 2)).
+		Wait(time.Duration(2) * time.Second).
+		Try(func(attempt uint) error {
+			runner, err := clients.KubeClient.CoreV1().Pods(runnerNS).Get(engineName+"-runner", metav1.GetOptions{})
+			if err != nil {
+				return errors.Errorf("Unable to get the runner pod, due to %v", err)
+			}
+			if runner.Name == "" {
+				log.Info("waiting for runner pod creation")
+				return errors.Errorf("runner pod is yet not created")
+			}
+			log.Infof("[Info]: Runner pod Name %v", runner.Name)
+
+			return nil
+		})
+	return err
 }
 
 //DeploymentStatusCheck checks running status of deployment with deployment name and namespace
@@ -49,7 +71,7 @@ func DeploymentStatusCheck(testsDetails *types.TestDetails, deploymentName, depl
 	sampleApp, _ := clients.KubeClient.AppsV1().Deployments(deploymentNS).Get(deploymentName, metav1.GetOptions{})
 	for count := 0; count < 20; count++ {
 		if sampleApp.Status.UnavailableReplicas != 0 {
-			log.Infof("Application is Creating, Currently Unavaliable Count is: %v \n", sampleApp.Status.UnavailableReplicas)
+			log.Infof("Application is Creating, Currently Unavaliable Count is: %v ", sampleApp.Status.UnavailableReplicas)
 			sampleApp, _ = clients.KubeClient.AppsV1().Deployments(deploymentNS).Get(deploymentName, metav1.GetOptions{})
 			time.Sleep(5 * time.Second)
 
@@ -57,7 +79,7 @@ func DeploymentStatusCheck(testsDetails *types.TestDetails, deploymentName, depl
 			break
 		}
 		if count == 19 {
-			return errors.Errorf("%v fails to get in Running state, due to %v", deploymentName, err)
+			return errors.Errorf("%v fails to get in Running state", deploymentName)
 		}
 	}
 	return nil
@@ -77,7 +99,7 @@ func OperatorStatusCheck(testsDetails *types.TestDetails, clients environment.Cl
 			break
 		}
 		if count == 19 {
-			return errors.Errorf("%v fails to get in Running state, due to %v", testsDetails.OperatorName, err)
+			return errors.Errorf("%v fails to get in Running state", testsDetails.OperatorName)
 		}
 	}
 	log.Info("[Status]: Operator is in Running state")
@@ -90,7 +112,7 @@ func DeploymentCleanupCheck(testsDetails *types.TestDetails, deploymentName stri
 	sampleApp, _ := clients.KubeClient.AppsV1().Deployments(testsDetails.AppNS).Get(deploymentName, metav1.GetOptions{})
 	for count := 0; count < 20; count++ {
 		if sampleApp.Status.AvailableReplicas != 0 {
-			log.Infof("Application is Deleting, Currently Avaliable Count is: %v \n", sampleApp.Status.AvailableReplicas)
+			log.Infof("Application is Deleting, Currently Avaliable Count is: %v ", sampleApp.Status.AvailableReplicas)
 			sampleApp, _ = clients.KubeClient.AppsV1().Deployments(testsDetails.AppNS).Get(deploymentName, metav1.GetOptions{})
 			time.Sleep(5 * time.Second)
 
@@ -98,7 +120,7 @@ func DeploymentCleanupCheck(testsDetails *types.TestDetails, deploymentName stri
 			break
 		}
 		if count == 19 {
-			return errors.Errorf("%v termination fails, due to %v", deploymentName, err)
+			return errors.Errorf("%v termination fails", deploymentName)
 		}
 	}
 	log.Info("[Cleanup]: Application deleted successfully")
@@ -121,7 +143,7 @@ func PodStatusCheck(testsDetails *types.TestDetails, clients environment.ClientS
 				}
 				for _, pod := range PodList.Items {
 					if string(pod.Status.Phase) != "Running" {
-						log.Infof("Currently, the experiment job pod is in %v State, Please Wait ...\n", pod.Status.Phase)
+						log.Infof("Currently, the experiment job pod is in %v State, Please Wait ...", pod.Status.Phase)
 						time.Sleep(5 * time.Second)
 					} else {
 						flag = true
@@ -129,7 +151,7 @@ func PodStatusCheck(testsDetails *types.TestDetails, clients environment.ClientS
 
 					}
 				}
-				if flag == true {
+				if flag {
 					break
 				}
 				if count == 19 {
@@ -217,6 +239,29 @@ func WaitForRunnerCompletion(testsDetails *types.TestDetails, clients environmen
 				return errors.Errorf("Runner pod is not yet completed")
 			}
 			log.Infof("Runner pod status is %v", runner.Status.Phase)
+
+			return nil
+		})
+
+	return err
+}
+
+//WaitForChaosResultCompletion waits for chaosresult state to get completed
+func WaitForChaosResultCompletion(testsDetails *types.TestDetails, clients environment.ClientSets) error {
+	err := retry.
+		Times(uint(testsDetails.Duration / testsDetails.Delay)).
+		Wait(time.Duration(testsDetails.Delay) * time.Second).
+		Try(func(attempt uint) error {
+			chaosResult, err := clients.LitmusClient.ChaosResults(testsDetails.ChaosNamespace).Get(testsDetails.EngineName+"-"+testsDetails.ExperimentName, metav1.GetOptions{})
+			if err != nil {
+				return errors.Errorf("Fail to get the chaosresult, due to %v", err)
+			}
+
+			if string(chaosResult.Status.ExperimentStatus.Phase) != "Completed" {
+				klog.Infof("ChaosResult status is %v", chaosResult.Status.ExperimentStatus.Phase)
+				return errors.Errorf("ChaosResult is not yet completed")
+			}
+			klog.Infof("ChaosResult status is %v", chaosResult.Status.ExperimentStatus.Phase)
 
 			return nil
 		})

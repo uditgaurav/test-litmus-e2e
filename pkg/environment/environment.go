@@ -15,30 +15,35 @@ func GetENV(testDetails *types.TestDetails, expName, engineName string) {
 	testDetails.ChaosNamespace = Getenv("CHAOS_NAMESPACE", "litmus")
 	testDetails.AppNS = Getenv("APP_NS", "litmus")
 	testDetails.AppLabel = Getenv("APP_LABEL", "run=nginx")
-	testDetails.JobCleanUpPolicy = Getenv("JOB_CLEANUP_POLICY", "'retain'")
+	testDetails.JobCleanUpPolicy = Getenv("JOB_CLEANUP_POLICY", "retain")
 	testDetails.AnnotationCheck = Getenv("ANNOTATION_CHECK", "false")
 	testDetails.ApplicationNodeName = Getenv("APPLICATION_NODE_NAME", "")
 	testDetails.NodeSelectorName = Getenv("APPLICATION_NODE_NAME", "")
 	testDetails.ImagePullPolicy = Getenv("IMAGE_PULL_POLICY", "Always")
+	testDetails.ExperimentImagePullPolicy = Getenv("EXPERIMENT_IMAGE_PULL_POLICY", "Always")
 	testDetails.ChaosDuration, _ = strconv.Atoi(Getenv("TOTAL_CHAOS_DURATION", ""))
-	testDetails.ChaosServiceAccount = Getenv("CHAOS_SERVICE_ACCOUNT", expName+"-sa")
+	testDetails.ChaosServiceAccount = Getenv("CHAOS_SERVICE_ACCOUNT", "")
 	testDetails.NewExperimentName = Getenv("NEW_EXPERIMENT_NAME", expName)
 	testDetails.Delay, _ = strconv.Atoi(Getenv("DELAY", "5"))
 	testDetails.Duration, _ = strconv.Atoi(Getenv("DURATION", "90"))
-	testDetails.FillPercentage, _ = strconv.Atoi(Getenv("FILL_PERCENTAGE", "80"))
+	testDetails.FillPercentage, _ = strconv.Atoi(Getenv("FILL_PERCENTAGE", "20"))
 	testDetails.CPUKillCommand = Getenv("CPU_KILL_COMMAND", "kill -9 $(ps afx | grep \"[md5sum] /dev/zero\" | awk '{print$1}' | tr '\\n' ' ')")
 	testDetails.MemoryKillCommand = Getenv("MEMORY_KILL_COMMAND", "kill -9 $(ps afx | grep \"[dd] if /dev/zero\" | awk '{print$1}' | tr '\\n' ' ')")
-	testDetails.InstanceID = Getenv("INSTANCE_ID", "i-0ce7b2857f08c85d0")
+	testDetails.InstanceID = Getenv("EC2_INSTANCE_ID", "")
+	testDetails.InstanceTag = Getenv("EC2_INSTANCE_TAG", "")
+	testDetails.EBSVolumeID = Getenv("EBS_VOLUME_ID", "")
+	testDetails.EBSVolumeTag = Getenv("EBS_VOLUME_TAG", "")
 	testDetails.Region = Getenv("REGION", "us-west-1")
 	testDetails.UpdateWebsite = Getenv("UPDATE_WEBSITE", "false")
+	testDetails.TargetNodes = Getenv("TARGET_NODES", "")
+	testDetails.NodeLabel = Getenv("NODE_LABEL", "")
 
 	//All Images for running chaos test
 	testDetails.AnsibleExperimentImage = Getenv("ANSIBLE_EXPERIMENT_IMAGE", "litmuschaos/ansible-runner:ci")
 	testDetails.GoExperimentImage = Getenv("GO_EXPERIMENT_IMAGE", "litmuschaos/go-runner:ci")
 	testDetails.OperatorImage = Getenv("OPERATOR_IMAGE", "litmuschaos/chaos-operator:ci")
 	testDetails.RunnerImage = Getenv("RUNNER_IMAGE", "litmuschaos/chaos-runner:ci")
-	testDetails.LibImageDefault = Getenv("OLD_LIB_IMAGE", "litmuschaos/go-runner:latest")
-	testDetails.LibImageNew = Getenv("NEW_LIB_IMAGE", "litmuschaos/go-runner:ci")
+	testDetails.LibImage = Getenv("LIB_IMAGE", "")
 
 	// All Links for running chaos testing
 	testDetails.RbacPath = Getenv("RBAC_PATH", "https://hub.litmuschaos.io/api/chaos/master?file=charts/generic/"+expName+"/rbac.yaml")
@@ -47,9 +52,11 @@ func GetENV(testDetails *types.TestDetails, expName, engineName string) {
 	testDetails.AnsibleRbacPath = Getenv("ANSIBLE_RBAC_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/rbac.yaml")
 	testDetails.AnsibleExperimentPath = Getenv("ANSIBLE_EXPERIMENT_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/experiment.yaml")
 	testDetails.AnsibleEnginePath = Getenv("ANSIBLE_ENGINE_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/engine.yaml")
-	testDetails.InstallLitmus = Getenv("INSTALL_LITMUS", "https://litmuschaos.github.io/litmus/litmus-operator-latest.yaml")
+	testDetails.InstallLitmus = Getenv("INSTALL_LITMUS", "https://litmuschaos.github.io/litmus/litmus-operator-ci.yaml")
 	testDetails.AdminRbacPath = Getenv("ADMIN_RBAC_PATH", "https://litmuschaos.github.io/litmus/litmus-admin-rbac.yaml")
 
+	// Portal Envs
+	testDetails.Version = Getenv("RUN_VERSION", "ci")
 }
 
 // Getenv fetch the env and set the default value, if any

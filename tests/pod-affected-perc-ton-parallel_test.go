@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus-e2e/pkg"
 	"github.com/litmuschaos/litmus-e2e/pkg/environment"
 	"github.com/litmuschaos/litmus-e2e/pkg/types"
@@ -18,7 +19,7 @@ func TestGoPodAffectedPercentageParallel(t *testing.T) {
 }
 
 //BDD for testing experiment
-var _ = Describe("BDD of pod-delete experiment", func() {
+var _ = Describe("BDDs to check pod level experiment with affected percentage 100 and sequence in parallel", func() {
 
 	// BDD for cleaning all components before running the test
 	Context("cleanup for litmus components", func() {
@@ -34,12 +35,15 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 1
-	Context("Check for pod-delete experiment with pod", func() {
+	Context("Check for pod-delete experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check for the pod delete experiment", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
+
 			klog.Info("POD DELETE EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
 			By("[PreChaos]: Getting kubeconfig and generate clientset")
@@ -59,12 +63,12 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -79,7 +83,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -91,12 +95,14 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 2
-	Context("Check for container kill experiment", func() {
+	Context("Check for container kill experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check the container kill with pod affected percentage 100 and mode is parallel", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("CONTAINER KILL EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
@@ -118,12 +124,12 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -138,7 +144,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -149,12 +155,14 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 3
-	Context("Check for disk fill experiment", func() {
+	Context("Check for disk fill experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check the disk fill experiment when pod affected percentage is 100 and mode is parallel", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("DISK FILL EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
@@ -176,12 +184,12 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -196,7 +204,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -208,12 +216,14 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 4
-	Context("Check for litmus components", func() {
+	Context("Check pod cpu hog experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check the experiment when pod affected percentage is 100 and mode is parallel", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("POD CPU HOG EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
@@ -230,18 +240,17 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Checking the chaos operator running status
 			By("[Status]: Checking chaos operator status")
 			err = pkg.OperatorStatusCheck(&testsDetails, clients)
-			testsDetails.LibImageCI = testsDetails.LibImageNew
 			Expect(err).To(BeNil(), "Operator status check failed, due to {%v}", err)
 
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -256,7 +265,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -268,12 +277,14 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 5
-	Context("Check for litmus components", func() {
+	Context("Check pod memory hog experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check the experiment when pod affected percentage is 100 and mode is parallel", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("POD MEMORY HOG EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
@@ -295,12 +306,12 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -315,7 +326,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -327,12 +338,14 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 	})
 
 	// BDD TEST CASE 6
-	Context("Check for litmus components", func() {
+	Context("Check pod network corruption experiment with 100% affected and sequence parallel", func() {
 
 		It("Should check the experiment when pod affected percentage is 100 and mode is parallel", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			klog.Info("POD NETWORK CORRUPTION EXPERIMENT WITH PODS_AFFECTED_PERC=100 AND SEQUENCE=PARALLEL")
 			//Getting kubeConfig and Generate ClientSets
@@ -354,12 +367,12 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			testsDetails.PodsAffectedPercentage = "100"
-			err = pkg.PrepareChaos(&testsDetails, true)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, true)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -374,7 +387,7 @@ var _ = Describe("BDD of pod-delete experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict

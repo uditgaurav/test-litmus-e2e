@@ -4,9 +4,9 @@
 IS_DOCKER_INSTALLED = $(shell which docker >> /dev/null 2>&1; echo $$?)
 
 # docker info
-DOCKER_REPO ?= uditgaurav
+DOCKER_REPO ?= litmuschaos
 DOCKER_IMAGE ?= litmus-e2e
-DOCKER_TAG ?= refactor
+DOCKER_TAG ?= ci
 
 .PHONY: build-litmus
 build-litmus:
@@ -15,6 +15,14 @@ build-litmus:
 	@echo "Building Litmus "
 	@echo "----------------"
 	@go test tests/install-litmus_test.go -v -count=1
+
+.PHONY: build-litmus-ns-mode
+build-litmus-ns-mode:
+
+	@echo "----------------------------------"
+	@echo "Building Litmus In Namespace Mode "
+	@echo "----------------------------------"
+	@go test tests/install-litmus-ns-mode_test.go -v -count=1	
 
 .PHONY: app-deploy
 app-deploy:
@@ -89,6 +97,14 @@ pod-cpu-hog:
 	@echo "--------------------------------"
 	@go test tests/pod-cpu-hog_test.go -v -count=1
 
+.PHONY: pod-cpu-hog-exec
+pod-cpu-hog-exec:
+
+	@echo "-------------------------------"
+	@echo "Running pod-cpu-hog-exec experiment"
+	@echo "--------------------------------"
+	@go test tests/pod-cpu-hog-exec_test.go -v -count=1
+
 .PHONY: node-cpu-hog
 node-cpu-hog:
 
@@ -128,6 +144,14 @@ pod-memory-hog:
 	@echo "Running pod-memory-hog experiment"
 	@echo "---------------------------------"
 	@go test tests/pod-memory-hog_test.go -v -count=1
+
+.PHONY: pod-memory-hog-exec
+pod-memory-hog-exec:
+
+	@echo "---------------------------------"
+	@echo "Running pod-memory-hog-exec experiment"
+	@echo "---------------------------------"
+	@go test tests/pod-memory-hog-exec_test.go -v -count=1
 
 .PHONY: kubelet-service-kill
 kubelet-service-kill:
@@ -177,13 +201,37 @@ node-io-stress:
 	@echo "------------------------------------------"
 	@go test tests/node-io-stress_test.go -v -count=1	
 
-.PHONY: ec2-terminate
-ec2-terminate:
+.PHONY: ec2-terminate-by-id
+ec2-terminate-by-id:
 
 	@echo "------------------------------------------"
-	@echo "Running ec2-terminate experiment"
+	@echo "Running ec2-terminate-by-id experiment"
 	@echo "------------------------------------------"
-	@go test tests/ec2-terminate_test.go -v -count=1			
+	@go test platform/aws/ec2-terminate-by-id_test.go -v -count=1 -timeout=20m
+
+.PHONY: ec2-terminate-by-tag
+ec2-terminate-by-tag:
+
+	@echo "------------------------------------------"
+	@echo "Running ec2-terminate-by-tag experiment"
+	@echo "------------------------------------------"
+	@go test platform/aws/ec2-terminate-by-tag_test.go -v -count=1 -timeout=20m		
+
+.PHONY: ebs-loss-by-id
+ebs-loss-by-id:
+
+	@echo "------------------------------------------"
+	@echo "Running ebs-loss-by-id experiment"
+	@echo "------------------------------------------"
+	@go test platform/aws/ebs-loss-by-id_test.go -v -count=1 -timeout=20m		
+
+.PHONY: ebs-loss-by-tag
+ebs-loss-by-tag:
+
+	@echo "------------------------------------------"
+	@echo "Running ebs-loss-by-tag experiment"
+	@echo "------------------------------------------"
+	@go test platform/aws/ebs-loss-by-tag_test.go -v -count=1 -timeout=20m					
 
 .PHONY: operator-reconcile-resiliency-check
  operator-reconcile-resiliency-check:
@@ -191,7 +239,7 @@ ec2-terminate:
 	@echo "--------------------------------------------"
 	@echo "Running  Operator Reconcile Resiliency Check"
 	@echo "--------------------------------------------"
-	@go test operator/reconcile-resiliency_test.go -v -count=1
+	@go test components/operator/reconcile-resiliency_test.go -v -count=1
 
 .PHONY: admin-mode-check
 admin-mode-check:
@@ -199,14 +247,14 @@ admin-mode-check:
 	@echo "------------------------"
 	@echo "Running Admin Mode Check"
 	@echo "------------------------"
-	@go test operator/admin-mode_test.go -v -count=1	
+	@go test components/operator/admin-mode_test.go -v -count=1	
 
-.PHONY: without-app-info
-without-app-info:
+.PHONY: with-app-info
+with-app-info:
 	@echo "-----------------------------"
-	@echo "Running Without App info test"
+	@echo "Running With App info test"
 	@echo "-----------------------------"
-	@go test tests/without-appinfo_test.go -v -count=1 -timeout=30m		
+	@go test tests/with-appinfo_test.go -v -count=1 -timeout=30m		
 
 .PHONY: pod-affected-perc-ton-parallel
 pod-affected-perc-ton-parallel:
@@ -227,7 +275,28 @@ multiple-app-deploy:
 	@echo "------------------------------------------------"
 	@echo "Running Pod Level Chaos With Multiple app deploy"
 	@echo "------------------------------------------------"
-	@go test tests/multiple-app-deploy_test.go -v -count=1 -timeout=30m					
+	@go test tests/multiple-app-deploy_test.go -v -count=1 -timeout=30m
+
+.PHONY: run-history
+run-history:
+	@echo "------------------------------------------------"
+	@echo "Running Run History Check"
+	@echo "------------------------------------------------"
+	@go test components/result/run-history_test.go -v -count=1
+
+.PHONY: node-selector
+node-selector:
+	@echo "-----------------------------------"
+	@echo "Running Node Selector Check"
+	@echo "-----------------------------------"
+	@go test tests/node-selector_test.go -v -count=1
+
+.PHONY: env-from-secret-and-configmap
+env-from-secret-and-configmap:
+	@echo "------------------------------------------------------"
+	@echo "Running Pod Delete Chaos ENV from Secret and ConfigMap"
+	@echo "------------------------------------------------------"
+	@go test tests/env-from-secret-and-cm_test.go -v -count=1					
 
 .PHONY: app-cleanup
 app-cleanup:
@@ -407,7 +476,7 @@ annotation-check:
 	@echo "-----------------------------------------"
 	@echo "Running Annotation Check For Chaos Engine"
 	@echo "-----------------------------------------"
-	@go test engine/annotation-check_test.go -v -count=1
+	@go test components/engine/annotation-check_test.go -v -count=1
 
 
 .PHONY: appinfo
@@ -416,7 +485,7 @@ appinfo:
 	@echo "---------------------------------------"
 	@echo "Running App Info Check For Chaos Engine"
 	@echo "---------------------------------------"
-	@go test engine/appinfo_test.go -v -count=1
+	@go test components/engine/appinfo_test.go -v -count=1
 
 .PHONY: engine-state
 engine-state:
@@ -424,7 +493,7 @@ engine-state:
 	@echo "---------------------------------------"
 	@echo "Running App Info Check For Chaos Engine"
 	@echo "---------------------------------------"
-	@go test engine/engine-state_test.go -v -count=1
+	@go test components/engine/engine-state_test.go -v -count=1
 
 .PHONY: experiment-404
 experiment-404:
@@ -432,7 +501,7 @@ experiment-404:
 	@echo "----------------------------------------------"
 	@echo "Running Experiment Name Check For Chaos Engine"
 	@echo "----------------------------------------------"
-	@go test engine/experiment-404_test.go -v -count=1
+	@go test components/engine/experiment-404_test.go -v -count=1
 
 .PHONY: job-cleanup-policy
 job-cleanup-policy:
@@ -440,7 +509,7 @@ job-cleanup-policy:
 	@echo "-------------------------------------------------"
 	@echo "Running Job Cleanup Policy Check For Chaos Engine"
 	@echo "-------------------------------------------------"
-	@go test engine/job-cleanup-policy_test.go -v -count=1
+	@go test components/engine/job-cleanup-policy_test.go -v -count=1
 
 .PHONY: service-account
 service-account:
@@ -448,7 +517,7 @@ service-account:
 	@echo "----------------------------------------------"
 	@echo "Running Service Account Check For Chaos Engine"
 	@echo "----------------------------------------------"
-	@go test engine/service-account_test.go -v -count=1
+	@go test components/engine/service-account_test.go -v -count=1
 
 .PHONY: experiment-image
 experiment-image:
@@ -456,7 +525,7 @@ experiment-image:
 	@echo "---------------------------------------------------"
 	@echo "Running Experiment Image Check For Chaos Experiment"
 	@echo "---------------------------------------------------"
-	@go test engine/service-account_test.go -v -count=1
+	@go test components/experiment/experiment-image_test.go -v -count=1
 
 .PHONY: target-pod
 target-pod:
@@ -464,4 +533,4 @@ target-pod:
 	@echo "-----------------------------"
 	@echo "Running Target pod chaos test"
 	@echo "-----------------------------"
-	@go test experiment/target-pod_test.go -v -count=1
+	@go test components/experiment/target-pod_test.go -v -count=1

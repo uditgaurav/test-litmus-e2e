@@ -3,6 +3,7 @@ package tests
 import (
 	"testing"
 
+	"github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus-e2e/pkg"
 	"github.com/litmuschaos/litmus-e2e/pkg/environment"
 	"github.com/litmuschaos/litmus-e2e/pkg/types"
@@ -28,6 +29,8 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 
 			testsDetails := types.TestDetails{}
 			clients := environment.ClientSets{}
+			chaosExperiment := v1alpha1.ChaosExperiment{}
+			chaosEngine := v1alpha1.ChaosEngine{}
 
 			//Getting kubeConfig and Generate ClientSets
 			By("[PreChaos]: Getting kubeconfig and generate clientset")
@@ -47,12 +50,12 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
-			err = pkg.PrepareChaos(&testsDetails, false)
+			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, false)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
 			//Checking runner pod running state
 			By("[Status]: Runner pod running status check")
-			_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+			err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 			Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 			//Chaos pod running status check
@@ -67,7 +70,7 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
-			_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+			err = pkg.ChaosResultVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 			//Checking chaosengine verdict
@@ -78,12 +81,14 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 		})
 
 		// BDD TEST CASE 3
-		Context("Check for disk fill experiment", func() {
+		Context("Check disk fill experiment with annotation true", func() {
 
 			It("Should check the disk fill experiment when app is annotated", func() {
 
 				testsDetails := types.TestDetails{}
 				clients := environment.ClientSets{}
+				chaosExperiment := v1alpha1.ChaosExperiment{}
+				chaosEngine := v1alpha1.ChaosEngine{}
 
 				//Getting kubeConfig and Generate ClientSets
 				By("[PreChaos]: Getting kubeconfig and generate clientset")
@@ -108,19 +113,18 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 
 				//Installing Chaos Experiment for disk-fill
 				By("[Install]: Installing chaos experiment")
-				testsDetails.LibImageCI = testsDetails.LibImageNew
-				err = pkg.InstallGoChaosExperiment(&testsDetails, testsDetails.ChaosNamespace)
+				err = pkg.InstallGoChaosExperiment(&testsDetails, &chaosExperiment, testsDetails.ChaosNamespace, clients)
 				Expect(err).To(BeNil(), "Fail to install chaos experiment, due to {%v}", err)
 
 				//Installing Chaos Engine for disk-fill
 				By("[Install]: Installing chaos engine")
 				testsDetails.AnnotationCheck = "true"
-				err = pkg.InstallGoChaosEngine(&testsDetails, testsDetails.ChaosNamespace)
+				err = pkg.InstallGoChaosEngine(&testsDetails, &chaosEngine, testsDetails.ChaosNamespace, clients)
 				Expect(err).To(BeNil(), "Fail to install chaosengine, due to {%v}", err)
 
 				//Checking runner pod running state
 				By("[Status]: Runner pod running status check")
-				_, err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
+				err = pkg.RunnerPodStatus(&testsDetails, testsDetails.AppNS, clients)
 				Expect(err).To(BeNil(), "Runner pod status check failed, due to {%v}", err)
 
 				//Chaos pod running status check
@@ -135,7 +139,7 @@ var _ = Describe("BDD of disk-fill experiment", func() {
 
 				//Checking the chaosresult verdict
 				By("[Verdict]: Checking the chaosresult verdict")
-				_, err = pkg.ChaosResultVerdict(&testsDetails, clients)
+				err = pkg.ChaosResultVerdict(&testsDetails, clients)
 				Expect(err).To(BeNil(), "ChasoResult Verdict check failed, due to {%v}", err)
 
 				//Checking chaosengine verdict
