@@ -52,7 +52,10 @@ jobs:
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
           chmod +x ./kind
           ./kind create cluster --wait 5m
-          kubectl get nodes
+          ls -a
+          ls -a /home/runner || true
+          export KUBECONFIG=$HOME/.kube/config
+          kubectl get node
 
           
       - name: Install Litmus In Namespace Mode
