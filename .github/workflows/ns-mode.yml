@@ -3,8 +3,10 @@ name: Namespace-Mode-Pipeline
 on:
   workflow_dispatch:
     inputs:
-      e2eTestImage:
-        default: "litmuschaos/litmus-e2e:ci"
+      e2eTestRepo:
+        default: "litmuschaos/litmus-e2e"
+      e2eTestBranch:
+        default: "master"        
       goExperimentImage:
         default: "litmuschaos/go-runner:ci"
       libImage:
@@ -29,37 +31,36 @@ defaults:
 jobs:
 
   Pod_Delete_Namespace_Mode:
-    container:
-      image: "${{ github.event.inputs.e2eTestImage }}"
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock:rw      
-      env:
-        OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
-        RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-        IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
-        CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
-        APP_NS: "${{ github.event.inputs.chaosNamespace }}"
-        CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: $HOME/.kube/config
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
 
-      - run: |
-          apk add --update curl && rm -rf /var/cache/apk/*
-          apk add --update docker openrc && rc-update add docker boot
-
-      #Install and configure a kind cluster
-      - name: Installing KinD cluster for the test
-        uses: engineerd/setup-kind@v0.5.0
+      - uses: actions/checkout@v2
         with:
-            version: "v0.7.0"
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'
 
-      - name: Configuring and testing the Installation
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'          
+          
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
         run: |
-          kubectl taint nodes kind-control-plane node-role.kubernetes.io/master-
-          kind get kubeconfig --internal >$HOME/.kube/config
-          kubectl cluster-info --context kind-kind
-          kubectl get nodes 
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=180s
+          mkdir -p $HOME/.kube
+          cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+          kubectl get nodes
+
           
       - name: Install Litmus In Namespace Mode
         run: |
