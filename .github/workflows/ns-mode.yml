@@ -44,6 +44,10 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
 
+      - run: |
+          apk add --update curl && rm -rf /var/cache/apk/*
+          apk add --update docker openrc && rc-update add docker boot
+
       #Install and configure a kind cluster
       - name: Installing KinD cluster for the test
         uses: engineerd/setup-kind@v0.5.0
