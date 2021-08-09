@@ -45,7 +45,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: '1.16'
-          
+
       - uses: actions/checkout@v2
         with:
           repository: '${{ github.event.inputs.e2eTestRepo }}'
@@ -54,8 +54,10 @@ jobs:
       #Install and configure a k3s cluster
       - name: Installing Prerequisites (K3S Cluster)
         run: |
-          kind create cluster --wait 5m
-          kind config use-context kind-kind
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
+          chmod +x ./kind
+          ./kind create cluster --wait 5m
+          ./kind config use-context kind-kind
           kubectl get nodes
           
       - name: Install Litmus In Namespace Mode
