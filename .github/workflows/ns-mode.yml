@@ -68,3 +68,392 @@ jobs:
 
       - name: Running Pod Delete Tests
         run: make pod-delete
+        
+
+  Pod_CPU_Hog_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod CPU Hog Tests
+        run: make pod-cpu-hog
+        
+  Pod_Memory_Hog_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Memory Hog Tests
+        run: make pod-memory-hog
+        
+  Pod_IO_Stress_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod IO Stress Tests
+        run: make pod-io-stress
+
+  Disk_Fill_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Disk Fill Tests
+        run: make disk-fill            
+
+  Pod_Network_Loss_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Network Loss Tests
+        run: make pod-network-loss
+        
+  Pod_Network_Latency_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Network Latency Tests
+        run: make pod-network-latency
+        
+  Pod_Network_Corruption_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Network Corruption Tests
+        run: make pod-network-corruption
+        
+  Pod_Network_Duplication_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Pod Network Duplication Tests
+        run: make pod-network-dupplication
+        
+  Container_Kill_NS_Mode:
+    runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    steps:
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
+      #Install and configure a k3s cluster
+      - name: Installing Prerequisites (K3S Cluster)
+        run: |
+          curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
+          kubectl wait node --all --for condition=ready --timeout=90s
+          kubectl get nodes
+          
+      - name: Install Litmus In Namespace Mode
+        run: |
+          kubectl create ns ${APP_NS}
+          make build-litmus-ns-mode
+
+      - name: Create nginx deployment in chaos namespace
+        run: |
+          kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
+          kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
+          kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
+
+      - name: Running Container Kill Tests
+        run: make container-kill
+        
