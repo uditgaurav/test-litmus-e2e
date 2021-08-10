@@ -170,8 +170,8 @@ jobs:
   App_Cleanup:
     needs: [Pod_Level_Test,Experiment_Tunables]
     if: always()
-      env:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+    env:
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
     runs-on: ubuntu-latest
     steps:
@@ -183,9 +183,9 @@ jobs:
   Litmus_Cleanup:
     needs: App_Cleanup
     if: always()
-      env:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-        POD_LEVEL: "true"
+    env:
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      POD_LEVEL: "true"
 
     runs-on: ubuntu-latest
     steps:
