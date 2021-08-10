@@ -28,20 +28,20 @@ jobs:
 
   Pod_Level_Test:
     if: always()
-      env:
-        OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
-        OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
-        RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-        IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
-        GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"
-        LIB_IMAGE: "${{ github.event.inputs.libImage }}"
-        EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
-        CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
-        CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
-        UPDATE_WEBSITE: "false"
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
-
     runs-on: ubuntu-latest
+    env:
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
+      GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"
+      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
+      EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      UPDATE_WEBSITE: "false"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
+    
     steps:
 
       - name: Installing Prerequisites (K3S Cluster)
@@ -51,13 +51,16 @@ jobs:
           kubectl get nodes
           
       - name: Litmus Infra Setup In Cluster-1
+        if: ${{ always() }}      
         run: |
           make build-litmus
 
       - name: Deploy App In Cluster-1
+        if: ${{ always() }}      
         run: make app-deploy
     
       - name: TCID-EC2-GENERIC-APP-POD-DELETE
+        if: ${{ always() }}      
         run: make pod-delete
 
       - name: TCID-EC2-GENERIC-APP-CONTAINER-KILL
@@ -107,22 +110,22 @@ jobs:
   ### Runing Experiment Tunables
   Experiment_Tunables:
     if: always()
-      env:
-        GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"
-        LIB_IMAGE: "${{ github.event.inputs.libImage }}"
-        EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
-        CHAOS_NAMESPACE: "${{ github.event.inputs.expTunnableNS }}"
-        CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
-        APP_NS: "${{ github.event.inputs.expTunnableNS }}"
-        APP_LABEL: "app=nginx"
-        UPDATE_WEBSITE: "false"
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-        OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
-        OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
-        RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-        IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
-
     runs-on: ubuntu-latest
+    env:
+      GO_EXPERIMENT_IMAGE: "${{ github.event.inputs.goExperimentImage }}"
+      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
+      EXPERIMENT_IMAGE_PULL_POLICY: "${{ github.event.inputs.experimentImagePullPolicy }}"
+      CHAOS_NAMESPACE: "${{ github.event.inputs.expTunnableNS }}"
+      CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
+      APP_NS: "${{ github.event.inputs.expTunnableNS }}"
+      APP_LABEL: "app=nginx"
+      UPDATE_WEBSITE: "false"
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
+      OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
+      RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
+    
     steps:
     
       - name: Installing Prerequisites (K3S Cluster)
