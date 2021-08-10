@@ -34,6 +34,7 @@ jobs:
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       APP_NS: "${{ github.event.inputs.chaosNamespace }}"
+      APP_LABEL: "app=nginx"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml
     steps:
