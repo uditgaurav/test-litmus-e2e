@@ -3,8 +3,10 @@ name: Pod-Level-Pipeline
 on:
   workflow_dispatch:
     inputs:
-      e2eTestImage:
-        default: "litmuschaos/litmus-e2e:ci"
+      e2eTestRepo:
+        default: "uditgaurav/test-litmus-e2e"
+      e2eTestBranch:
+        default: "master" 
       goExperimentImage:
         default: "litmuschaos/go-runner:ci"
       libImage:
@@ -21,8 +23,7 @@ on:
         default: "Always"
       experimentImagePullPolicy:
         default: "Always"
-      chaosServiceAccount:
-        default: ""
+
 
 jobs:
 
@@ -43,6 +44,16 @@ jobs:
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
     
     steps:
+    
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+    
 
       - name: Installing Prerequisites (K3S Cluster)
         run: |
@@ -127,7 +138,16 @@ jobs:
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
     
     steps:
-    
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16'
+
+      - uses: actions/checkout@v2
+        with:
+          repository: '${{ github.event.inputs.e2eTestRepo }}'
+          ref: '${{ github.event.inputs.e2eTestBranch }}'      
+
       - name: Installing Prerequisites (K3S Cluster)
         run: |
           curl -sfL https://get.k3s.io | sh -s - --docker --write-kubeconfig-mode 664
