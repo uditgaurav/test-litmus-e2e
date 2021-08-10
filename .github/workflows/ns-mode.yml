@@ -56,11 +56,11 @@ jobs:
           
       - name: Install Litmus In Namespace Mode
         run: |
+          kubectl create ns ${APP_NS}
           make build-litmus-ns-mode
 
       - name: Create nginx deployment in chaos namespace
         run: |
-          kubectl create ns ${APP_NS}
           kubectl create deploy nginx --image=nginx:alpine --replicas 3 -n ${APP_NS}
           kubectl wait --for=condition=Ready pods --all --namespace ${APP_NS} --timeout=180s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${APP_NS} --overwrite
