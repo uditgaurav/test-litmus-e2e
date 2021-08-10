@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       e2eTestRepo:
-        default: "uditgaurav/test-litmus-e2e"
+        default: "litmuschaos/litmus-e2e"
       e2eTestBranch:
         default: "master" 
       goExperimentImage:
-        default: "litmuschaos/go-runner:ci"
+        default: "litmuschaos/go-runner:2.0.0-RC1"
       libImage:
-        default: "litmuschaos/go-runner:ci"
+        default: "litmuschaos/go-runner:2.0.0-RC1"
       operatorImage:
-        default: "litmuschaos/chaos-operator:ci"
+        default: "litmuschaos/chaos-operator:2.0.0-RC1"
       runnerImage:
-        default: "litmuschaos/chaos-runner:ci"
+        default: "litmuschaos/chaos-runner:2.0.0-RC1"
       expTunnableNS:
         default: "experiments-tunnable"
       chaosNamespace:
