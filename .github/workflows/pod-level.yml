@@ -12,9 +12,9 @@ on:
       libImage:
         default: "litmuschaos/go-runner:2.0.0-RC1"
       operatorImage:
-        default: "litmuschaos/chaos-operator:2.0.0-RC1"
+        default: "litmuschaos/chaos-operator:2.0.0"
       runnerImage:
-        default: "litmuschaos/chaos-runner:2.0.0-RC1"
+        default: "litmuschaos/chaos-runner:2.0.0"
       expTunnableNS:
         default: "experiments-tunnable"
       chaosNamespace:
@@ -41,6 +41,7 @@ jobs:
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       UPDATE_WEBSITE: "false"
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
+      POD_LEVEL: "true"      
     
     steps:
     
@@ -84,6 +85,18 @@ jobs:
       - name: TCID-EC2-GENERIC-APP-POD-NETWORK-DUPLICATION
         if: ${{ always() }}
         run: make pod-network-duplication
+        
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup 
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
 
   Stress_Chaos_Test:
@@ -101,6 +114,7 @@ jobs:
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       UPDATE_WEBSITE: "false"
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
+      POD_LEVEL: "true"      
     
     steps:
     
@@ -152,6 +166,18 @@ jobs:
       - name: TCID-EC2-GENERIC-APP-DISK-FILL
         if: ${{ always() }}
         run: make disk-fill
+        
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup         
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
   Container_Kill_Test:
     if: always()
@@ -168,6 +194,7 @@ jobs:
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       UPDATE_WEBSITE: "false"
       KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
+      POD_LEVEL: "true"      
     
     steps:
     
@@ -199,6 +226,18 @@ jobs:
       - name: TCID-EC2-GENERIC-APP-CONTAINER-KILL
         if: ${{ always() }}
         run: make container-kill
+        
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup      
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
 
   Pod_Delete_Test:
@@ -215,7 +254,8 @@ jobs:
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       UPDATE_WEBSITE: "false"
-      KUBECONFIG: /etc/rancher/k3s/k3s.yaml   
+      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      POD_LEVEL: "true"      
     
     steps:
     
@@ -247,6 +287,18 @@ jobs:
       - name: TCID-EC2-GENERIC-APP-POD-DELETE
         if: ${{ always() }}      
         run: make pod-delete
+        
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup      
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
 
   ### Runing Experiment Tunables
@@ -266,7 +318,8 @@ jobs:
       OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
       OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"  
+      POD_LEVEL: "true"      
     
     steps:
 
@@ -307,6 +360,18 @@ jobs:
         run: |
           kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
           kubectl delete ns ${CHAOS_NAMESPACE}
+          
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup    
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
   ### Runing Experiment Tunables
   PAP_100_Mode_Serial:
@@ -325,7 +390,8 @@ jobs:
       OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
       OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"
+      POD_LEVEL: "true"      
     
     steps:
 
@@ -367,6 +433,18 @@ jobs:
         run: |
           kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
           kubectl delete ns ${CHAOS_NAMESPACE}
+          
+      - name: Application Cleanup
+        if: ${{ always() }}      
+        run: make app-cleanup
+
+      - name: Litmus Cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup       
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
 
 
   ### Runing Experiment Tunables
@@ -386,7 +464,8 @@ jobs:
       OPERATOR_IMAGE: "${{ github.event.inputs.operatorImage }}"
       OPERATOR_NAME: "${{ github.event.inputs.operatorName }}"
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
-      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
+      IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}" 
+      POD_LEVEL: "true"      
     
     steps:
 
@@ -429,28 +508,11 @@ jobs:
           kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
           kubectl delete ns ${CHAOS_NAMESPACE}
 
-  ### App Cleanup
-  App_Cleanup:
-    needs: [Network_Chaos_Test,Stress_Chaos_Test,Container_Kill_Test,Pod_Delete_Test,PAP_100_Mode_Parallel,PAP_100_Mode_Serial,Multiple_App_Deploy]
-    if: always()
-    env:
-      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Application Cleanup
-        run: make app-cleanup
-
-  ### Litmus Cleanup
-
-  Litmus_Cleanup:
-    needs: App_Cleanup
-    if: always()
-    env:
-      KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      POD_LEVEL: "true"
-
-    runs-on: ubuntu-latest
-    steps:
       - name: Litmus Cleanup
-        run: make litmus-cleanup
+        if: ${{ always() }}      
+        run: make litmus-cleanup 
+        
+      - name: Deleting K3S cluster
+        if: always()
+        run: /usr/local/bin/k3s-uninstall.sh        
+
