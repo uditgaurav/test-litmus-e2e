@@ -3,7 +3,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io/ioutil"1.13.8
 	"net/http"
 	"strconv"
 	"strings"
@@ -425,10 +425,10 @@ func setupLitmusInNamespaceMode(testsDetails *types.TestDetails) error {
 	if err != nil {
 		return errors.Errorf("fail to apply create crds, err: %v", err)
 	}
-	if err := DownloadFile("/tmp/install-litmus-operator.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-namespaced-operator.yaml"); err != nil {
+	if err := DownloadFile("/tmp/install-litmus-operator.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/mkdocs/docs/litmus-namespaced-scope/litmus-namespaced-operator.yaml"); err != nil {
 		return errors.Errorf("Fail to fetch litmus operator file, due to %v", err)
 	}
-	if err = configureOperator(testsDetails, "/tmp/install-litmus-operator.yaml", "1.13.8", "default"); err != nil {
+	if err = configureOperator(testsDetails, "/tmp/install-litmus-operator.yaml", "1.13.8", "1.13.8"); err != nil {
 		log.Errorf("fail to update the operator manifest,err: %v", err)
 	}
 	if err := DownloadFile("/tmp/install-litmus-sa.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/mkdocs/docs/litmus-namespaced-scope/litmus-ns-experiment-rbac.yaml"); err != nil {
