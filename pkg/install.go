@@ -3,7 +3,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"1.13.8
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
