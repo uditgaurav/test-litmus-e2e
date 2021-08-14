@@ -113,6 +113,18 @@ jobs:
       - name: Running Pod CPU Hog Tests
         run: make pod-cpu-hog
         
+      - name: "[Debug]"
+        if: failed()
+        run: |
+          echo "kubectl get pods -n ${APP_NS}"
+          kubectl get pods -n ${APP_NS}
+          echo "kubectl get chaosengine -n ${APP_NS}"
+          kubectl get chaosengine -n ${APP_NS}
+          echo "kubectl get sa -n ${APP_NS}"
+          kubectl get sa -n ${APP_NS}
+          echo "kubectl describe chaosengine -n ${APP_NS}"
+          kubectl describe chaosengine -n ${APP_NS}
+        
   Pod_Memory_Hog_NS_Mode:
     runs-on: ubuntu-latest
     env:
