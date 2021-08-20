@@ -420,18 +420,18 @@ func setupLitmusInNamespaceMode(testsDetails *types.TestDetails) error {
 
 	log.Info("Installing Litmus in Namespace mode...")
 	//Creating crds
-	command := []string{"apply", "-f", "https://raw.githubusercontent.com/litmuschaos/litmus/master/mkdocs/docs/litmus-namespaced-scope/litmus-namespaced-crds.yaml"}
+	command := []string{"apply", "-f", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-namespaced-crds.yaml"}
 	err := Kubectl(command...)
 	if err != nil {
 		return errors.Errorf("fail to apply create crds, err: %v", err)
 	}
-	if err := DownloadFile("/tmp/install-litmus-operator.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/mkdocs/docs/litmus-namespaced-scope/litmus-namespaced-operator.yaml"); err != nil {
+	if err := DownloadFile("/tmp/install-litmus-operator.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-namespaced-operator.yaml"); err != nil {
 		return errors.Errorf("Fail to fetch litmus operator file, due to %v", err)
 	}
-	if err = configureOperator(testsDetails, "/tmp/install-litmus-operator.yaml", "1.13.8", "1.13.8"); err != nil {
+	if err = configureOperator(testsDetails, "/tmp/install-litmus-operator.yaml", "1.13.8", "default"); err != nil {
 		log.Errorf("fail to update the operator manifest,err: %v", err)
 	}
-	if err := DownloadFile("/tmp/install-litmus-sa.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/mkdocs/docs/litmus-namespaced-scope/litmus-ns-experiment-rbac.yaml"); err != nil {
+	if err := DownloadFile("/tmp/install-litmus-sa.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-ns-experiment-rbac.yaml"); err != nil {
 		return errors.Errorf("Fail to fetch litmus sa file, due to %v", err)
 	}
 	//Modify Namespace field of the RBAC
