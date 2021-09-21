@@ -2,7 +2,11 @@
 name: Scheduled-Component-Pipeline
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "30 20 * * *" # Daily 02:30 AM in midnight
+
+defaults:
+  run:
+    working-directory: /go/src
 
 jobs:
 
@@ -22,6 +26,13 @@ jobs:
         with:
           go-version: '1.16'
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install pygithub
+        run: python3 -m pip install pygithub
+
       - uses: actions/checkout@v2
         with:
           repository: 'litmuschaos/litmus-e2e'
@@ -33,12 +44,12 @@ jobs:
           kubectl wait node --all --for condition=ready --timeout=90s
           kubectl get nodes
           
-      - name: Litmus Infra Setup In Cluster-1
+      - name: Litmus Infra Setup 
         if: ${{ always() }}      
         run: |
           make build-litmus
 
-      - name: Deploy App In Cluster-1
+      - name: Deploy App 
         if: ${{ always() }}      
         run: make app-deploy
 
@@ -92,6 +103,13 @@ jobs:
         with:
           go-version: '1.16'
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install pygithub
+        run: python3 -m pip install pygithub          
+
       - uses: actions/checkout@v2
         with:
           repository: 'litmuschaos/litmus-e2e'
@@ -103,12 +121,12 @@ jobs:
           kubectl wait node --all --for condition=ready --timeout=90s
           kubectl get nodes
           
-      - name: Litmus Infra Setup In Cluster-1
+      - name: Litmus Infra Setup 
         if: ${{ always() }}      
         run: |
           make build-litmus
 
-      - name: Deploy App In Cluster-1
+      - name: Deploy App 
         if: ${{ always() }}      
         run: make app-deploy
 
@@ -178,6 +196,13 @@ jobs:
         with:
           go-version: '1.16'
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install pygithub
+        run: python3 -m pip install pygithub          
+
       - uses: actions/checkout@v2
         with:
           repository: 'litmuschaos/litmus-e2e'
@@ -189,12 +214,12 @@ jobs:
           kubectl wait node --all --for condition=ready --timeout=90s
           kubectl get nodes
           
-      - name: Litmus Infra Setup In Cluster-1
+      - name: Litmus Infra Setup 
         if: ${{ always() }}      
         run: |
           make build-litmus
 
-      - name: Deploy App In Cluster-1
+      - name: Deploy App 
         if: ${{ always() }}      
         run: make app-deploy
 
@@ -252,6 +277,13 @@ jobs:
         with:
           go-version: '1.16'
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install pygithub
+        run: python3 -m pip install pygithub          
+
       - uses: actions/checkout@v2
         with:
           repository: 'litmuschaos/litmus-e2e'
@@ -263,12 +295,12 @@ jobs:
           kubectl wait node --all --for condition=ready --timeout=90s
           kubectl get nodes
           
-      - name: Litmus Infra Setup In Cluster-1
+      - name: Litmus Infra Setup 
         if: ${{ always() }}      
         run: |
           make build-litmus
 
-      - name: Deploy App In Cluster-1
+      - name: Deploy App 
         if: ${{ always() }}      
         run: make app-deploy
 
