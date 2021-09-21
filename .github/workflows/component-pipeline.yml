@@ -20,7 +20,7 @@ on:
       experimentImagePullPolicy:
         default: "Always"
       chaosServiceAccount:
-        default: "
+        default: ""
 
 jobs:
 
