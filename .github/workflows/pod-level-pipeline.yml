@@ -392,6 +392,9 @@ jobs:
         
       - name: Create Namespace and deploy Application
         run: |
+          kubectl create ns ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
 
       - name: TCID-K3S-GENERIC-APP-POD-AFFECTED-PERCENTAGE-TON-PARALLEL
@@ -473,6 +476,9 @@ jobs:
         
       - name: Create Namespace and deploy Application
         run: |
+          kubectl create ns ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
           
       - name: TCID-K3S-GENERIC-APP-POD-AFFECTED-PERCENTAGE-TON-SERIES
@@ -556,6 +562,9 @@ jobs:
         
       - name: Create Namespace and deploy Application
         run: |
+          kubectl create ns ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
 
       - name: TCID-K3S-GENERIC-APP-MULTIPLE-APP-DEPLOY
@@ -574,7 +583,7 @@ jobs:
         run: |      
           operator_name=$(kubectl get pods -n litmus -l app.kubernetes.io/component=operator --no-headers | awk '{print$1}')
           kubectl logs $operator_name -n litmus > logs.txt
-          cat logs.txt        
+          cat logs.txt     
 
       - name: Experiment Tunables Cleanup
         if: ${{ always() }}
