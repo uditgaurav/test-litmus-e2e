@@ -71,10 +71,23 @@ jobs:
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-CORRUPTION
         if: ${{ always() }}
         run: make pod-network-corruption
+        
+      - name: "[Debug]: check chaos resources"
+        if: ${{ failure() }}
+        continue-on-error: true
+        run: |
+          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)        
 
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-LATENCY
         if: ${{ always() }}
         run: make pod-network-latency
+        
+      - name: "[Debug]: check chaos resources"
+        if: ${{ failure() }}
+        continue-on-error: true
+        run: |
+          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)
+        
 
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-LOSS
         if: ${{ always() }}
@@ -88,7 +101,7 @@ jobs:
         if: ${{ failure() }}
         continue-on-error: true
         run: |
-          bash <(curl -s https://raw.githubusercontent.com/litmuschaos/litmus-e2e/master/build/debug.sh)
+          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)
           
       - name: "[Debug]: check operator logs"
         if: ${{ failure() }}
