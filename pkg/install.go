@@ -180,7 +180,7 @@ func setExperimentVar(chaosExperiment *v1alpha1.ChaosExperiment, testsDetails *t
 	}
 
 	// Modify LIB Image
-	if testsDetails.LibImage == "" || strings.Contains(libImage, "go-runner") {
+	if testsDetails.LibImage == "" && strings.Contains(libImage, "go-runner") {
 		testsDetails.LibImage = testsDetails.ExperimentImage
 	} else {
 		testsDetails.LibImage = libImage
