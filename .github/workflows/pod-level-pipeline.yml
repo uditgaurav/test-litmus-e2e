@@ -10,7 +10,7 @@ on:
       experimentImage:
         default: "litmuschaos/go-runner:ci"
       libImage:
-        default: "litmuschaos/go-runner:ci"
+        default: ""
       operatorImage:
         default: "litmuschaos/chaos-operator:ci"
       runnerImage:
@@ -34,7 +34,6 @@ jobs:
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       APP_NS: "${{ github.event.inputs.chaosNamespace }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
@@ -131,7 +130,6 @@ jobs:
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       APP_NS: "${{ github.event.inputs.chaosNamespace }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
@@ -224,7 +222,6 @@ jobs:
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       APP_NS: "${{ github.event.inputs.chaosNamespace }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
@@ -296,7 +293,6 @@ jobs:
       RUNNER_IMAGE: "${{ github.event.inputs.runnerImage }}"
       IMAGE_PULL_POLICY: "${{ github.event.inputs.imagePullPolicy }}"        
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.chaosNamespace }}"
       APP_NS: "${{ github.event.inputs.chaosNamespace }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
@@ -367,7 +363,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.expTunnableNS }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       APP_NS: "${{ github.event.inputs.expTunnableNS }}"
@@ -451,7 +446,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.expTunnableNS }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       APP_NS: "${{ github.event.inputs.expTunnableNS }}"
@@ -537,7 +531,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPERIMENT_IMAGE: "${{ github.event.inputs.experimentImage }}"
-      LIB_IMAGE: "${{ github.event.inputs.libImage }}"
       CHAOS_NAMESPACE: "${{ github.event.inputs.expTunnableNS }}"
       CHAOS_SERVICE_ACCOUNT: "${{ github.event.inputs.chaosServiceAccount }}"
       APP_NS: "${{ github.event.inputs.expTunnableNS }}"
