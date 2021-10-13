@@ -33,14 +33,22 @@ func GetENV(testDetails *types.TestDetails, expName, engineName string) {
 	testDetails.InstanceTag = Getenv("EC2_INSTANCE_TAG", "")
 	testDetails.EBSVolumeID = Getenv("EBS_VOLUME_ID", "")
 	testDetails.EBSVolumeTag = Getenv("EBS_VOLUME_TAG", "")
+	testDetails.VMInstanceNames = Getenv("VM_INSTANCE_NAMES", "")
+	testDetails.GCPProjectID = Getenv("GCP_PROJECT_ID", "")
+	testDetails.InstanceZones = Getenv("INSTANCE_ZONES", "")
+	testDetails.DiskVolumeNames = Getenv("DISK_VOLUME_NAMES", "")
+	testDetails.DiskZones = Getenv("DISK_ZONES", "")
+	testDetails.DeviceNames = Getenv("DEVICE_NAMES", "")
 	testDetails.Region = Getenv("REGION", "us-west-1")
 	testDetails.UpdateWebsite = Getenv("UPDATE_WEBSITE", "false")
 	testDetails.TargetNodes = Getenv("TARGET_NODES", "")
 	testDetails.NodeLabel = Getenv("NODE_LABEL", "")
+	testDetails.Args = Getenv("ARGS", "")
+	testDetails.Command = Getenv("COMMAND", "")
 
 	//All Images for running chaos test
 	testDetails.AnsibleExperimentImage = Getenv("ANSIBLE_EXPERIMENT_IMAGE", "litmuschaos/ansible-runner:ci")
-	testDetails.GoExperimentImage = Getenv("GO_EXPERIMENT_IMAGE", "litmuschaos/go-runner:ci")
+	testDetails.ExperimentImage = Getenv("EXPERIMENT_IMAGE", "litmuschaos/go-runner:ci")
 	testDetails.OperatorImage = Getenv("OPERATOR_IMAGE", "litmuschaos/chaos-operator:ci")
 	testDetails.RunnerImage = Getenv("RUNNER_IMAGE", "litmuschaos/chaos-runner:ci")
 	testDetails.LibImage = Getenv("LIB_IMAGE", "")
@@ -52,7 +60,7 @@ func GetENV(testDetails *types.TestDetails, expName, engineName string) {
 	testDetails.AnsibleRbacPath = Getenv("ANSIBLE_RBAC_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/rbac.yaml")
 	testDetails.AnsibleExperimentPath = Getenv("ANSIBLE_EXPERIMENT_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/experiment.yaml")
 	testDetails.AnsibleEnginePath = Getenv("ANSIBLE_ENGINE_PATH", "https://raw.githubusercontent.com/litmuschaos/chaos-charts/master/charts/generic/"+expName+"/ansible/engine.yaml")
-	testDetails.InstallLitmus = Getenv("INSTALL_LITMUS", "https://litmuschaos.github.io/litmus/litmus-operator-ci.yaml")
+	testDetails.InstallLitmus = Getenv("INSTALL_LITMUS", "https://litmuschaos.github.io/litmus/litmus-operator-latest.yaml")
 	testDetails.AdminRbacPath = Getenv("ADMIN_RBAC_PATH", "https://litmuschaos.github.io/litmus/litmus-admin-rbac.yaml")
 
 	// Portal Envs

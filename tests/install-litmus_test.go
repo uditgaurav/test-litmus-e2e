@@ -42,7 +42,7 @@ var _ = Describe("BDD of Litmus installation", func() {
 
 			//Installing Litmus
 			By("Installing Litmus")
-			err = pkg.InstallLitmus(&testsDetails, "cluster")
+			err = pkg.InstallLitmus(&testsDetails)
 			Expect(err).To(BeNil(), "Litmus installation failed, due to {%v}", err)
 
 			// Checking the chaos operator running status

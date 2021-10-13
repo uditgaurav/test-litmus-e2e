@@ -16,14 +16,6 @@ build-litmus:
 	@echo "----------------"
 	@go test tests/install-litmus_test.go -v -count=1
 
-.PHONY: build-litmus-ns-mode
-build-litmus-ns-mode:
-
-	@echo "----------------------------------"
-	@echo "Building Litmus In Namespace Mode "
-	@echo "----------------------------------"
-	@go test tests/install-litmus-ns-mode_test.go -v -count=1	
-
 .PHONY: app-deploy
 app-deploy:
 
@@ -232,6 +224,22 @@ ebs-loss-by-tag:
 	@echo "Running ebs-loss-by-tag experiment"
 	@echo "------------------------------------------"
 	@go test platform/aws/ebs-loss-by-tag_test.go -v -count=1 -timeout=20m					
+
+.PHONY: gcp-vm-instance-stop
+gcp-vm-instance-stop:
+  
+	@echo "------------------------------------------"
+	@echo "Running gcp-vm-instance-stop experiment"
+	@echo "------------------------------------------"
+	@go test platform/gcp/gcp-vm-instance-stop_test.go -v -count=1 -timeout=20m
+
+.PHONY: gcp-vm-disk-loss
+gcp-vm-disk-loss:
+  
+	@echo "------------------------------------------"
+	@echo "Running gcp-vm-disk-loss experiment"
+	@echo "------------------------------------------"
+	@go test platform/gcp/gcp-vm-disk-loss_test.go -v -count=1 -timeout=20m
 
 .PHONY: operator-reconcile-resiliency-check
  operator-reconcile-resiliency-check:

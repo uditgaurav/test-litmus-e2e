@@ -181,7 +181,7 @@ func ChaosPodStatus(testsDetails *types.TestDetails, clients environment.ClientS
 				return errors.Errorf("Experiment pod fail to initialise, due to %v", err)
 			}
 
-		} else if len(chaosEngine.Status.Experiments[0].ExpPod) == 0 {
+		} else if chaosEngine.Status.Experiments[0].ExpPod == "" {
 			time.Sleep(time.Duration(testsDetails.Delay) * time.Second)
 			if count == ((testsDetails.Duration / testsDetails.Delay) - 1) {
 				return errors.Errorf("Experiment pod fails to create, due to %v", err)
@@ -200,8 +200,8 @@ func ChaosPodStatus(testsDetails *types.TestDetails, clients environment.ClientS
 	return nil
 }
 
-//WaitForEngineCompletion waits for engine state to get completed
-func WaitForEngineCompletion(testsDetails *types.TestDetails, clients environment.ClientSets) error {
+//WaitForEngineStatus waits for engine state to get completed
+func WaitForEngineStatus(testsDetails *types.TestDetails, clients environment.ClientSets, status string) error {
 	err := retry.
 		Times(uint(testsDetails.Duration / testsDetails.Delay)).
 		Wait(time.Duration(testsDetails.Delay) * time.Second).
@@ -211,9 +211,9 @@ func WaitForEngineCompletion(testsDetails *types.TestDetails, clients environmen
 				return errors.Errorf("Fail to get the chaosengine, due to %v", err)
 			}
 
-			if string(chaosEngine.Status.EngineStatus) != "completed" {
+			if string(chaosEngine.Status.EngineStatus) != status {
 				log.Infof("Engine status is %v", chaosEngine.Status.EngineStatus)
-				return errors.Errorf("Engine is not yet completed")
+				return errors.Errorf("Engine is not yet %v", status)
 			}
 			log.Infof("Engine status is %v", chaosEngine.Status.EngineStatus)
 

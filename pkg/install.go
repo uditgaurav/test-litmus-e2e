@@ -105,7 +105,7 @@ func UpdateEngine(testsDetails *types.TestDetails, clients environment.ClientSet
 	engine.Spec.EngineState = v1alpha1.EngineStateActive
 
 	// Set all environments
-	SetEngineVar(engine, testsDetails)
+	setEngineVar(engine, testsDetails)
 
 	_, err = clients.LitmusClient.ChaosEngines(testsDetails.ChaosNamespace).Update(engine)
 	if err != nil {
@@ -118,15 +118,15 @@ func UpdateEngine(testsDetails *types.TestDetails, clients environment.ClientSet
 func UpdateExperiment(testsDetails *types.TestDetails, clients environment.ClientSets) error {
 	experiment, err := clients.LitmusClient.ChaosExperiments(testsDetails.ChaosNamespace).Get(testsDetails.ExperimentName, v1.GetOptions{})
 	if err != nil {
-		return errors.Errorf("[Error] : %v", err)
+		return errors.Errorf("fail to update experiment, err: %v", err)
 	}
 
 	// Set all environments
-	SetExperimentVar(experiment, testsDetails)
+	setExperimentVar(experiment, testsDetails)
 
 	_, err = clients.LitmusClient.ChaosExperiments(testsDetails.ChaosNamespace).Update(experiment)
 	if err != nil {
-		return errors.Errorf("[Error] : %v", err)
+		return errors.Errorf("fail to get experiment,err: %v", err)
 	}
 	return nil
 }
@@ -158,17 +158,16 @@ func InstallGoRbac(testsDetails *types.TestDetails, rbacNamespace string) error 
 	return nil
 }
 
-// SetExperimentVar setting up variables of experiment
-func SetExperimentVar(chaosExperiment *v1alpha1.ChaosExperiment, testsDetails *types.TestDetails) {
+// setExperimentVar setting up variables of experiment
+func setExperimentVar(chaosExperiment *v1alpha1.ChaosExperiment, testsDetails *types.TestDetails) {
 
 	// contains all the envs
 	envDetails := ENVDetails{
 		ENV: map[string]string{},
 	}
 
-	// Modify the goExperimentImage
-	chaosExperiment.Spec.Definition.Image = testsDetails.GoExperimentImage
-
+	// Modify the ExperimentImage
+	chaosExperiment.Spec.Definition.Image = testsDetails.ExperimentImage
 	// Modify experiment imagePullPolicy
 	chaosExperiment.Spec.Definition.ImagePullPolicy = corev1.PullPolicy(testsDetails.ExperimentImagePullPolicy)
 
@@ -182,7 +181,19 @@ func SetExperimentVar(chaosExperiment *v1alpha1.ChaosExperiment, testsDetails *t
 
 	// Modify LIB Image
 	if testsDetails.LibImage == "" && strings.Contains(libImage, "go-runner") {
-		testsDetails.LibImage = testsDetails.GoExperimentImage
+		testsDetails.LibImage = testsDetails.ExperimentImage
+	} else {
+		testsDetails.LibImage = libImage
+	}
+
+	// Modify Args
+	if testsDetails.Args != "" {
+		chaosExperiment.Spec.Definition.Args = strings.Split(testsDetails.Args, ",")
+	}
+
+	// Modify Image Command
+	if testsDetails.Command != "" {
+		chaosExperiment.Spec.Definition.Command = strings.Split(testsDetails.Command, ",")
 	}
 
 	// Modify ENV's
@@ -192,7 +203,7 @@ func SetExperimentVar(chaosExperiment *v1alpha1.ChaosExperiment, testsDetails *t
 		SetEnv("LIB", testsDetails.Lib).
 		SetEnv("LIB_IMAGE", testsDetails.LibImage)
 
-	log.Info("[LIB Image]: LIB image: " + testsDetails.LibImage + " !!!")
+	log.Info("[LIB Image]: Lib image is " + testsDetails.LibImage + " !!!")
 
 	// update all the values corresponding to keys from the ENV's in Experiment
 	for key, value := range chaosExperiment.Spec.Definition.ENVList {
@@ -225,7 +236,7 @@ func InstallGoChaosExperiment(testsDetails *types.TestDetails, chaosExperiment *
 	}
 
 	// Initialise experiment
-	SetExperimentVar(chaosExperiment, testsDetails)
+	setExperimentVar(chaosExperiment, testsDetails)
 
 	// Marshal serializes the value provided into a YAML document.
 	fileData, err := json.Marshal(chaosExperiment)
@@ -240,13 +251,13 @@ func InstallGoChaosExperiment(testsDetails *types.TestDetails, chaosExperiment *
 		return errors.Errorf("fail to apply experiment file, err: %v", err)
 	}
 	log.Info("[ChaosExperiment]: Experiment installed successfully !!!")
-	log.Info("[Experiment Image]: Chaos Experiment created successfully with image: " + testsDetails.GoExperimentImage + " !!!")
+	log.Info("[Experiment Image]: Chaos Experiment created successfully with image: " + testsDetails.ExperimentImage + " !!!")
 
 	return nil
 }
 
-// SetEngineVar setting up variables of engine
-func SetEngineVar(chaosEngine *v1alpha1.ChaosEngine, testsDetails *types.TestDetails) {
+// setEngineVar setting up variables of engine
+func setEngineVar(chaosEngine *v1alpha1.ChaosEngine, testsDetails *types.TestDetails) {
 
 	// contains all the envs
 	envDetails := ENVDetails{
@@ -289,15 +300,38 @@ func SetEngineVar(chaosEngine *v1alpha1.ChaosEngine, testsDetails *types.TestDet
 	case "ebs-loss-by-tag":
 		envDetails.SetEnv("EBS_VOLUME_TAG", testsDetails.EBSVolumeTag).
 			SetEnv("REGION", testsDetails.Region)
+	case "disk-fill":
+		if testsDetails.FillPercentage != 80 {
+			envDetails.SetEnv("FILL_PERCENTAGE", strconv.Itoa(testsDetails.FillPercentage))
+		}
+		// Here not using SetEnv function as SetEnv will not add new variables
+		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
+			Name:  "EPHEMERAL_STORAGE_MEBIBYTES",
+			Value: "200",
+		})
+	case "pod-cpu-hog-exec":
+		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
+			Name:  "CHAOS_KILL_COMMAND",
+			Value: testsDetails.CPUKillCommand,
+		})
+	case "pod-memory-hog-exec":
+		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
+			Name:  "CHAOS_KILL_COMMAND",
+			Value: testsDetails.MemoryKillCommand,
+		})
+	case "gcp-vm-instance-stop":
+		envDetails.SetEnv("GCP_PROJECT_ID", testsDetails.GCPProjectID).
+			SetEnv("VM_INSTANCE_NAMES", testsDetails.VMInstanceNames).
+			SetEnv("INSTANCE_ZONES", testsDetails.InstanceZones)
+	case "gcp-vm-disk-loss":
+		envDetails.SetEnv("GCP_PROJECT_ID", testsDetails.GCPProjectID).
+			SetEnv("DISK_VOLUME_NAMES", testsDetails.DiskVolumeNames).
+			SetEnv("DISK_ZONES", testsDetails.DiskZones).
+			SetEnv("DEVICE_NAMES", testsDetails.DeviceNames)
 	}
 
 	// for experiments like pod network latency
 	envDetails.SetEnv("NETWORK_LATENCY", testsDetails.NetworkLatency)
-
-	// update Engine if FillPercentage if it does not match criteria
-	if testsDetails.FillPercentage != 80 {
-		envDetails.SetEnv("FILL_PERCENTAGE", strconv.Itoa(testsDetails.FillPercentage))
-	}
 
 	// update App Node Details
 	if testsDetails.ApplicationNodeName != "" {
@@ -319,20 +353,6 @@ func SetEngineVar(chaosEngine *v1alpha1.ChaosEngine, testsDetails *types.TestDet
 		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
 			Name:  "NODE_LABEL",
 			Value: testsDetails.NodeLabel,
-		})
-	}
-
-	// CHAOS_KILL_COMMAND for pod-memory-hog and pod-cpu-hog
-	switch testsDetails.ExperimentName {
-	case "pod-cpu-hog-exec":
-		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
-			Name:  "CHAOS_KILL_COMMAND",
-			Value: testsDetails.CPUKillCommand,
-		})
-	case "pod-memory-hog-exec":
-		chaosEngine.Spec.Experiments[0].Spec.Components.ENV = append(chaosEngine.Spec.Experiments[0].Spec.Components.ENV, corev1.EnvVar{
-			Name:  "CHAOS_KILL_COMMAND",
-			Value: testsDetails.MemoryKillCommand,
 		})
 	}
 
@@ -367,7 +387,7 @@ func InstallGoChaosEngine(testsDetails *types.TestDetails, chaosEngine *v1alpha1
 	}
 
 	// Initialise engine
-	SetEngineVar(chaosEngine, testsDetails)
+	setEngineVar(chaosEngine, testsDetails)
 
 	// Marshal serializes the values provided into a YAML document.
 	fileData, err := json.Marshal(chaosEngine)
@@ -385,95 +405,31 @@ func InstallGoChaosEngine(testsDetails *types.TestDetails, chaosEngine *v1alpha1
 }
 
 //InstallLitmus installs the latest version of litmus
-func InstallLitmus(testsDetails *types.TestDetails, mode string) error {
+func InstallLitmus(testsDetails *types.TestDetails) error {
 
-	switch mode {
-	case "cluster":
-		return setupLitmusInClusterMode(testsDetails)
-
-	case "namespace":
-		return setupLitmusInNamespaceMode(testsDetails)
-
-	}
-	return errors.Errorf("invalid mode of installtion")
-}
-
-//setupLitmusInClusterMode will install the litmus in cluster mode
-func setupLitmusInClusterMode(testsDetails *types.TestDetails) error {
-
-	log.Info("Installing Litmus in Cluster mode...")
-	if err := DownloadFile("/tmp/install-litmus.yaml", testsDetails.InstallLitmus); err != nil {
+	log.Info("Installing Litmus ...")
+	if err := DownloadFile("install-litmus.yaml", testsDetails.InstallLitmus); err != nil {
 		return errors.Errorf("Fail to fetch litmus operator file, due to %v", err)
 	}
-
-	if err = configureOperator(testsDetails, "/tmp/install-litmus.yaml", "ci", "litmus"); err != nil {
-		return err
-	}
-
-	log.Info("Litmus installed successfully !!!")
-	return nil
-
-}
-
-//setupLitmusInClusterMode will install the litmus in namespace mode
-func setupLitmusInNamespaceMode(testsDetails *types.TestDetails) error {
-
-	log.Info("Installing Litmus in Namespace mode...")
-	//Creating crds
-	command := []string{"apply", "-f", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-namespaced-crds.yaml"}
-	err := Kubectl(command...)
-	if err != nil {
-		return errors.Errorf("fail to apply create crds, err: %v", err)
-	}
-	if err := DownloadFile("/tmp/install-litmus-operator.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-namespaced-operator.yaml"); err != nil {
-		return errors.Errorf("Fail to fetch litmus operator file, due to %v", err)
-	}
-	if err = configureOperator(testsDetails, "/tmp/install-litmus-operator.yaml", "1.13.8", "default"); err != nil {
-		log.Errorf("fail to update the operator manifest,err: %v", err)
-	}
-	if err := DownloadFile("/tmp/install-litmus-sa.yaml", "https://raw.githubusercontent.com/litmuschaos/litmus/master/docs/litmus-namespaced-scope/litmus-ns-experiment-rbac.yaml"); err != nil {
-		return errors.Errorf("Fail to fetch litmus sa file, due to %v", err)
-	}
-	//Modify Namespace field of the RBAC
-	err = EditFile("/tmp/install-litmus-sa.yaml", "namespace: default", "namespace: "+testsDetails.ChaosNamespace)
-	if err != nil {
-		return errors.Errorf("Fail to change the namespace in sa, due to %v", err)
-	}
-	//Creating engine
-	command = []string{"apply", "-f", "/tmp/install-litmus-sa.yaml"}
-	err = Kubectl(command...)
-	if err != nil {
-		return errors.Errorf("fail to create namespaced sa role for experiments, err: %v", err)
-	}
-	log.Info("Litmus installed successfully !!!")
-	return nil
-}
-
-//configureOperator will setup and create operator
-func configureOperator(testsDetails *types.TestDetails, filename, imgTag, operatorNS string) error {
-
 	log.Info("Updating ChaosOperator Image ...")
-	if err := EditFile(filename, "image: litmuschaos/chaos-operator:"+imgTag, "image: "+testsDetails.OperatorImage); err != nil {
+	if err := EditFile("install-litmus.yaml", "image: litmuschaos/chaos-operator:latest", "image: "+testsDetails.OperatorImage); err != nil {
 		return errors.Errorf("Unable to update operator image, due to %v", err)
 
 	}
-	if err = EditKeyValue(filename, "  - chaos-operator", "imagePullPolicy: Always", "imagePullPolicy: "+testsDetails.ImagePullPolicy); err != nil {
+	if err = EditKeyValue("install-litmus.yaml", "  - chaos-operator", "imagePullPolicy: Always", "imagePullPolicy: "+testsDetails.ImagePullPolicy); err != nil {
 		return errors.Errorf("Unable to update image pull policy, due to %v", err)
 	}
-	err = EditFile(filename, "namespace: "+operatorNS, "namespace: "+testsDetails.ChaosNamespace)
-	if err != nil {
-		return errors.Errorf("Fail to change the namespace in operator sa, due to %v", err)
-	}
 	log.Info("Updating Chaos Runner Image ...")
-	if err := EditKeyValue(filename, "CHAOS_RUNNER_IMAGE", "value: \"litmuschaos/chaos-runner:"+imgTag+"\"", "value: '"+testsDetails.RunnerImage+"'"); err != nil {
+	if err := EditKeyValue("install-litmus.yaml", "CHAOS_RUNNER_IMAGE", "value: \"litmuschaos/chaos-runner:latest\"", "value: '"+testsDetails.RunnerImage+"'"); err != nil {
 		return errors.Errorf("Unable to update runner image, due to %v", err)
 	}
 	//Creating engine
-	command := []string{"apply", "-f", filename, "-n", testsDetails.ChaosNamespace}
+	command := []string{"apply", "-f", "install-litmus.yaml"}
 	err := Kubectl(command...)
 	if err != nil {
 		return errors.Errorf("fail to apply litmus installation file, err: %v", err)
 	}
+	log.Info("Litmus installed successfully !!!")
 
 	return nil
 }

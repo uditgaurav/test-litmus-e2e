@@ -52,7 +52,7 @@ var _ = Describe("BDD of experiment image test", func() {
 			// Prepare Chaos Execution
 			By("[Prepare]: Prepare Chaos Execution")
 			// Provide wrong experiment image name
-			testsDetails.GoExperimentImage = "litmuschaos/dummy-image:v1"
+			testsDetails.ExperimentImage = "litmuschaos/dummy-image:v1"
 			err = pkg.PrepareChaos(&testsDetails, &chaosExperiment, &chaosEngine, clients, false)
 			Expect(err).To(BeNil(), "fail to prepare chaos, due to {%v}", err)
 
@@ -64,14 +64,7 @@ var _ = Describe("BDD of experiment image test", func() {
 
 			//Chaos pod running status check
 			err = pkg.ChaosPodStatus(&testsDetails, clients)
-			Expect(err).To(BeNil(), "unable to create chaos pod, due to {%v}", err)
-
-			//Waiting for chaos pod to get completed
-			//And Print the logs of the chaos pod
-			//The chaos pod logs should not get printed
-			By("[Status]: Wait for chaos pod completion and then print logs")
-			err = pkg.ChaosPodLogs(&testsDetails, clients)
-			Expect(err).NotTo(BeNil(), "[TEST FAILED]: chaos pod runs with invalid experiment image, due to {%v}", err)
+			Expect(err).NotTo(BeNil(), "unable to create chaos pod, due to {%v}", err)
 
 			//Checking the chaosresult verdict
 			By("[Verdict]: Checking the chaosresult verdict")
@@ -102,7 +95,7 @@ var _ = Describe("BDD of experiment image test", func() {
 			By("Checking the Verdict of Chaos Engine")
 			chaosEngineVerdict, err := pkg.GetChaosEngineVerdict(&testsDetails, clients)
 			Expect(err).To(BeNil(), "Fail to get the chaosengine Verdict, due to {%v}", err)
-			Expect(chaosEngineVerdict).To(Equal("Awaited"), "ChaosEngine Verdict is not Awaited, due to {%v}", err)
+			Expect(chaosEngineVerdict).To(Equal("N/A"), "ChaosEngine Verdict is not Awaited, due to {%v}", err)
 
 		})
 	})

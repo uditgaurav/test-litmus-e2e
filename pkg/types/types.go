@@ -18,7 +18,7 @@ type TestDetails struct {
 	JobCleanUpPolicy          string
 	AnnotationCheck           string
 	ApplicationNodeName       string
-	GoExperimentImage         string
+	ExperimentImage           string
 	InstallLitmus             string
 	OperatorImage             string
 	ImagePullPolicy           string
@@ -42,6 +42,12 @@ type TestDetails struct {
 	InstanceTag               string
 	EBSVolumeID               string
 	EBSVolumeTag              string
+	VMInstanceNames           string
+	GCPProjectID              string
+	InstanceZones             string
+	DiskVolumeNames           string
+	DiskZones                 string
+	DeviceNames               string
 	Region                    string
 	Lib                       string
 	PodsAffectedPercentage    string
@@ -49,4 +55,6 @@ type TestDetails struct {
 	Version                   string
 	TargetNodes               string
 	NodeLabel                 string
+	Args                      string
+	Command                   string
 }
