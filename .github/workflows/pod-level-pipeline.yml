@@ -388,7 +388,7 @@ jobs:
       - name: Create Namespace and deploy Application
         run: |
           kubectl create ns ${CHAOS_NAMESPACE}
-          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE} --replicas 3
           kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
 
@@ -413,15 +413,8 @@ jobs:
         if: ${{ always() }}
         run: |
           kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
-                    
-      - name: Application Cleanup
-        if: ${{ always() }}      
-        run: make app-cleanup
+          kubectl delete ns ${CHAOS_NAMESPACE}
 
-      - name: Litmus Cleanup
-        if: ${{ always() }}      
-        run: make litmus-cleanup    
-        
       - name: Deleting K3S cluster
         if: always()
         run: /usr/local/bin/k3s-uninstall.sh        
@@ -470,7 +463,7 @@ jobs:
       - name: Create Namespace and deploy Application
         run: |
           kubectl create ns ${CHAOS_NAMESPACE}
-          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE} --replicas 3
           kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
           
@@ -554,7 +547,7 @@ jobs:
       - name: Create Namespace and deploy Application
         run: |
           kubectl create ns ${CHAOS_NAMESPACE}
-          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE}
+          kubectl create deploy nginx --image=nginx:alpine -n ${CHAOS_NAMESPACE} --replicas 3
           kubectl wait --for=condition=Ready pods --all --namespace ${CHAOS_NAMESPACE} --timeout=90s
           kubectl annotate deploy/nginx litmuschaos.io/chaos="true" -n ${CHAOS_NAMESPACE} --overwrite
 
