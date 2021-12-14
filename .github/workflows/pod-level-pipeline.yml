@@ -1,5 +1,5 @@
 ---
-name: Litmus-Pod-Level-Pipeline
+name: Pod-Level-Pipeline
 on:
   workflow_dispatch:
     inputs:
@@ -71,23 +71,10 @@ jobs:
         if: ${{ always() }}
         run: make pod-network-corruption
         
-      - name: "[Debug]: check chaos resources"
-        if: ${{ failure() }}
-        continue-on-error: true
-        run: |
-          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)        
-
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-LATENCY
         if: ${{ always() }}
         run: make pod-network-latency
         
-      - name: "[Debug]: check chaos resources"
-        if: ${{ failure() }}
-        continue-on-error: true
-        run: |
-          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)
-        
-
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-LOSS
         if: ${{ always() }}
         run: make pod-network-loss
@@ -95,13 +82,13 @@ jobs:
       - name: TCID-K3S-GENERIC-APP-POD-NETWORK-DUPLICATION
         if: ${{ always() }}
         run: make pod-network-duplication
-        
+
       - name: "[Debug]: check chaos resources"
         if: ${{ failure() }}
         continue-on-error: true
         run: |
-          bash <(curl -s https://raw.githubusercontent.com/uditgaurav/test-litmus-e2e/master/build/debug.sh)
-          
+          bash <(curl -s https://raw.githubusercontent.com/litmuschaos/litmus-e2e/master/build/debug.sh)
+        
       - name: "[Debug]: check operator logs"
         if: ${{ failure() }}
         continue-on-error: true
@@ -408,12 +395,6 @@ jobs:
       - name: TCID-K3S-GENERIC-APP-POD-AFFECTED-PERCENTAGE-TON-PARALLEL
         run: make pod-affected-perc-ton-parallel
 
-      - name: Experiment Tunables Cleanup
-        if: ${{ always() }}
-        run: |
-          kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
-          kubectl delete ns ${CHAOS_NAMESPACE}
-          
       - name: "[Debug]: check chaos resources"
         if: ${{ failure() }}
         continue-on-error: true
@@ -427,7 +408,12 @@ jobs:
           operator_name=$(kubectl get pods -n litmus -l app.kubernetes.io/component=operator --no-headers | awk '{print$1}')
           kubectl logs $operator_name -n litmus > logs.txt
           cat logs.txt          
-          
+
+      - name: Experiment Tunables Cleanup
+        if: ${{ always() }}
+        run: |
+          kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
+                    
       - name: Application Cleanup
         if: ${{ always() }}      
         run: make app-cleanup
@@ -492,12 +478,6 @@ jobs:
         if: ${{ always() }}
         run: make pod-affected-perc-ton-series
 
-      - name: Experiment Tunables Cleanup
-        if: ${{ always() }}
-        run: |
-          kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
-          kubectl delete ns ${CHAOS_NAMESPACE}
-          
       - name: "[Debug]: check chaos resources"
         if: ${{ failure() }}
         continue-on-error: true
@@ -511,7 +491,12 @@ jobs:
           operator_name=$(kubectl get pods -n litmus -l app.kubernetes.io/component=operator --no-headers | awk '{print$1}')
           kubectl logs $operator_name -n litmus > logs.txt
           cat logs.txt          
-          
+
+      - name: Experiment Tunables Cleanup
+        if: ${{ always() }}
+        run: |
+          kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
+                    
       - name: Application Cleanup
         if: ${{ always() }}      
         run: make app-cleanup
@@ -597,11 +582,6 @@ jobs:
           kubectl delete chaosengines --all -n ${CHAOS_NAMESPACE}
           kubectl delete ns ${CHAOS_NAMESPACE}
 
-      - name: Litmus Cleanup
-        if: ${{ always() }}      
-        run: make litmus-cleanup 
-        
       - name: Deleting K3S cluster
         if: always()
         run: /usr/local/bin/k3s-uninstall.sh        
-
