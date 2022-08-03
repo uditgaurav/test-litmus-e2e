@@ -54,7 +54,7 @@ jobs:
     
       - name: Installing Prerequisites (K3S Cluster)
         run: |
-          curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.3+k3s1	sh -s - --docker --write-kubeconfig-mode 664
+          curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.21.11+k3s1	sh -s - --docker --write-kubeconfig-mode 664
           for i in range {0..100};do
            nodeState=$(kubectl get no --no-headers | awk '{print$2}')
            if [ ! -z "$nodeState" ]; then
@@ -62,7 +62,6 @@ jobs:
            fi
            sleep 2
           done
-          
           
           
       - name: Litmus Infra Setup In Cluster-1
